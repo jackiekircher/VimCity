@@ -96,7 +96,6 @@ class VimCityGame
   end
 
   def prompt(question)
-    VIM::message('prompting...')
     return VIM::evaluate("input('#{question}')").chomp
   end
 

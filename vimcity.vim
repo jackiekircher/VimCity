@@ -30,20 +30,20 @@ set cpo&vim           " go into noncompatible-mode
 " variable script path
 if !exists("vimcity_path")
   let s:vim_path = split(&runtimepath, ',')
-  let s:vimcity_path = s:vim_path[0]."/plugin/vim_city.vim"
+  let s:vimcity_path = s:vim_path[0]."/plugin/vimcity.vim"
 else
   let s:vimcity_path = vimcity_path
   unlet vimcity_path
 end
 
 " ## new command: VimCity ## "
-command! -nargs=0 VimCity :call <SID>VimCity(<args>)
+command! -nargs=0 VimCity :call <SID>vimcity(<args>)
 
-function! s:VimCity(...)
-  call vimcity#VimCity()
+function! s:vimcity(...)
+  call vimcity#vimcity()
 endfunction
 
-function! vimcity#VimCity()
+function! vimcity#vimcity()
   try
     call s:play()
   catch /^Vim:Interrupt$/
@@ -62,7 +62,7 @@ function! s:play()
 
   " load the game!
   ruby load "lib/vimcity.rb"
-  ruby VimCity.new
+  ruby VimCityGame.new
 endfunction
 
 let &cpo = s:user_cpo " restore user's compatible-mode
