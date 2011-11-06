@@ -1,7 +1,7 @@
 class Seitch < Building
 
   def initialize
-    @symbol = 'H'
+    @symbol = ['H']
     @height = 1
     @width  = 1
     @cost   = 100

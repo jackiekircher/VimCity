@@ -28,7 +28,6 @@ class VimCityGame
 
     @map = Map.new(@main_buffer)
 
-    @cursor = " "
 
     VIM::evaluate("genutils#MoveCursorToWindow(2)") #oh hey, 2 is the lower panel ./sigh
     start_game
@@ -95,9 +94,10 @@ class VimCityGame
   end
 
   def init_cursor
+    @cursor = [" "] #use an array for area cursors
     c = VIM::evaluate("getpos('.')")
-    @last_char = @main_buffer[c[1]][c[2]]
-    print_to_buffer(@main_buffer, c[1], c[2], "#{@cursor}")
+    @last_chars = cache_area(@main_buffer, c[1], 1, c[2], 1)
+    print_area_to_buffer(@main_buffer, c[1], c[2], @cursor)
   end
 
   def update_status_bar
@@ -111,8 +111,11 @@ class VimCityGame
 
   def update_cursor(x,y)
     c = VIM::evaluate("getpos('.')")
-    previous_char = @last_char
-    print_to_buffer(@main_buffer, c[1], c[2], previous_char)
+
+    cursor_height = @cursor.size
+    cursor_width  = @cursor.first.size
+
+    print_area_to_buffer(@main_buffer, c[1], c[2], @last_chars)
 
     c[1] += y
     c[1] = 1 if c[1] < 1
@@ -123,10 +126,11 @@ class VimCityGame
     c[2] = @map.width-(@map.offset-1) if c[2] >= (@map.width+@map.offset)
 
     VIM::evaluate("cursor(#{c[1]},#{c[2]})")
-    #VIM::evaluate("setpos('.', [#{c[0]},#{c[1]},#{c[2]},#{c[3]}])")
 
-    @last_char = @main_buffer[c[1]][c[2]]
-    print_to_buffer(@main_buffer, c[1], c[2], "#{@cursor}")
+    @last_char = cache_area(@main_buffer,
+                            c[1], cursor_height,
+                            c[2], cursor_width)
+    print_area_to_buffer(@main_buffer, c[1], c[2], @cursor)
   end
 
   def wait_for_input(valid_input)
@@ -171,10 +175,10 @@ class VimCityGame
       buffer[w.height-5] = "  Cost: #{building.cost}"
       buffer[w.height-7] = "  #{building.description}"
 
-      print_to_buffer(buffer,
-                      (w.height/2)-(2+building.height/2),
-                      (w.width/2)-(building.width/2),
-                      building.symbol)
+      print_area_to_buffer(buffer,
+                           (w.height/2)-(2+building.height/2),
+                           (w.width/2)-(building.width/2),
+                           building.symbol)
       redraw
 
       input = wait_for_input(["\t","\r"," "])
@@ -182,10 +186,22 @@ class VimCityGame
         # cycle through buildings
         select += 1
         select  = 0 if select > (buildings.size - 1)
+        (6...(w.height-1)).each do |row|
+          buffer[row] = " "*w.width
+        end
       elsif input == "\r"
         # select building
+        quit
+
+        #c = VIM::Window.current.cursor
+        c = VIM::evaluate("getpos('.')")
+        print_area_to_buffer(@main_buffer, c[1], c[2], @last_chars)
+        @last_chars = cache_area(@main_buffer,
+                                 c[1], building.height,
+                                 c[2], building.width)
         @cursor = building.symbol if building
-        break
+        print_area_to_buffer(@main_buffer, c[1], c[2], @cursor)
+        return
       else
         break
       end
