@@ -22,4 +22,17 @@ module VimWrapper
   def quit
     VIM::command('q!')
   end
+
+  def popup_buffer(name, width=0)
+    VIM::command('vsplit')
+    VIM::evaluate("genutils#MoveCursorToWindow(3)")
+    VIM::command("silent e #{name}")
+    VIM::command("vertical resize #{width}") if width > 0
+    VIM::command("setlocal noreadonly")
+    VIM::command("setlocal nonumber")
+    VIM::command("setlocal noswapfile")
+    VIM::command("setlocal buftype=nofile")
+
+    return VIM::Buffer.current
+  end
 end

@@ -145,16 +145,26 @@ class VimCityGame
   end
 
   def building_menu
-    buildings = Building::BUILDING_TYPES.dup
-    select = buildings.count
-    buildings << "none"
+    
+    buffer = popup_buffer('new_building', 44)
+
+    window = VIM::Window.current
+    (1...window.height).each do |line|
+      buffer.append(line, " "*window.width)
+    end
+    buffer[1] = "--------------------------------------------"
+    buffer[2] = "--- press tab to view all building types ---"
+    buffer[3] = "--------------------------------------------"
+    buffer[4] = "---        press space to cancel         ---"
+    buffer[5] = "--------------------------------------------"
+    redraw
+
+    buildings = Building::BUILDING_TYPES
+    select = 0
 
     while true
       #building preview
-      if buildings[select] == "none"
-      else
-        building = Kernel.const_get(buildings[select]).new
-      end
+      building = Kernel.const_get(buildings[select]).new
 
       input = wait_for_input(["\t","\r"," "])
       if input == "\t"
@@ -164,12 +174,14 @@ class VimCityGame
       elsif input == "\r"
         # select building
         @cursor = building.symbol if building
-        return
+        break
       else
-        return
+        break
       end
     end
 
+    quit
   end
 
 end
+

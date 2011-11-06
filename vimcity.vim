@@ -69,9 +69,6 @@ function! s:play()
   setlocal buftype=nofile
   setlocal nowrap
 
-  " would be nice if this worked...
-  "call genutils#MoveCursorToNextInWinStack('D')
-
   " load the game!
   ruby load "lib/vimcity.rb"
   ruby VimCityGame.new
