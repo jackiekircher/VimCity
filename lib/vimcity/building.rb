@@ -13,4 +13,7 @@ class Building
   def add_to_city(city)
     city.coins -= self.cost
   end
+
+  def remove_from_city(city)
+  end
 end
