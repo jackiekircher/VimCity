@@ -60,6 +60,7 @@ function! s:play()
   setlocal noswapfile
   setlocal buftype=nofile
   setlocal nowrap
+  setlocal so=999
 
   exec "sp Welcome_to_VimCity"
   exec "resize 1"

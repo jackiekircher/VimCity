@@ -26,10 +26,9 @@ class VimCityGame
     @height = @main_window.height
     @width  = @main_window.width
 
+    @map = Map.new(@main_buffer, 20, 300)
     @insert_mode = false
     @current_building = nil
-
-    @map = Map.new(@main_buffer)
 
 
     VIM::evaluate("genutils#MoveCursorToWindow(2)") #oh hey, 2 is the lower panel ./sigh
@@ -86,6 +85,7 @@ class VimCityGame
       end
 
       update_status_bar
+      @city.update()
       wait 80
     end
   end
@@ -119,7 +119,6 @@ class VimCityGame
 
   def update_status_bar
     VIM::evaluate("genutils#MoveCursorToWindow(1)")
-    @city.coins +=100
     @status_buffer[1] = " "*@width
     print_to_buffer(@status_buffer, 1, 0,  "Money: #{@city.coins}c")
     print_to_buffer(@status_buffer, 1, 18, "Population: #{@city.population}")
@@ -136,11 +135,11 @@ class VimCityGame
 
     c[0] += y
     c[0] = 1 if c[0] < 1
-    c[0] = @map.height+1 if c[0] >= @map.height+1
+    c[0] = @map.height+2-cursor_height if c[0]+cursor_height >= @map.height+2
 
     c[1] += x
     c[1] = @map.offset if c[1] < @map.offset
-    c[1] = @map.width-(@map.offset-0) if c[1] >= (@map.width+@map.offset)
+    c[1] = @map.width-(@map.offset)-cursor_width+2 if c[1]+cursor_width >= (@map.width+@map.offset+1)
 
     set_cursor_pos(c[0], c[1])
 

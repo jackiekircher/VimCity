@@ -5,16 +5,15 @@ class Map
 
   include Printer
 
-  def initialize(buffer)
+  def initialize(buffer, width=200,  height=70)
     @buffer = buffer
     @offset = 1
-    @width = 20
-    @height = 20
+    @width = width
+    @height = height
 
     @buildings_grid = Array.new(@height) { Array.new(@width) { " " } }
 
     empty_space= " "*@offset + "."*@width 
-    
     @buffer[1]=empty_space
 
     (0...@height).each do |line|
