@@ -1,7 +1,6 @@
 require_relative 'printer'
 
 class VimCityGame
-  include VimWrapper
   include Printer
 
   def initialize
@@ -16,18 +15,20 @@ class VimCityGame
     @height = @window.height
     @width  = @window.width
 
+    @map = Map.new(@main_buffer)
     start_game
   end
 
   def start_game
-    Map.new(@main_buffer)
 
     display_splash
     #wait_for_input("any")
     display_menu
 
     init_city
-    init_status_bar
+    update_status_bar
+
+    init_cursor
 
     # start game loop
     while true
@@ -42,30 +43,21 @@ class VimCityGame
         end
         redraw
       elsif input == 'h'
-        c = VIM::evaluate("getpos('.')")
-        c[2] -= 1
-        VIM::evaluate("setpos('.', [#{c[0]},#{c[1]},#{c[2]},#{c[3]}])")
+        update_cursor(-1,0)
       elsif input == 'j'
-        c = VIM::evaluate("getpos('.')")
-        c[1] -= 1
-        VIM::evaluate("setpos('.', [#{c[0]},#{c[1]},#{c[2]},#{c[3]}])")
+        update_cursor(0,1)
       elsif input == 'k'
-        c = VIM::evaluate("getpos('.')")
-        c[1] += 1
-        VIM::evaluate("setpos('.', [#{c[0]},#{c[1]},#{c[2]},#{c[3]}])")
+        update_cursor(0,-1)
       elsif input == 'l'
-        c = VIM::evaluate("getpos('.')")
-        c[2] += 1
-        VIM::evaluate("setpos('.', [#{c[0]},#{c[1]},#{c[2]},#{c[3]}])")
+        update_cursor(1,0)
       end
 
-      blink_cursor
+      update_status_bar
       wait 50
     end
   end
 
   def display_splash
-    @main_buffer[1] = "foo"
     #TODO
   end
 
@@ -73,20 +65,46 @@ class VimCityGame
     #TODO
   end
 
+
+  private
+
   def init_city
     # load city stuff here when we get to it
 
     @city = City.new()
   end
 
-  def init_status_bar
-    @status_buffer[1] = " "*@width
-    print_to_buffer(@status_buffer, 0, 1, "Money: #{@city.coins}c")
-    print_to_buffer(@status_buffer, 18, 1, "Population: #{@city.population}")
+  def init_cursor
+    c = VIM::evaluate("getpos('.')")
+    @last_char = @main_buffer[c[1]][c[2]]
+    print_to_buffer(@main_buffer, c[1], c[2], '.')
   end
 
+  def update_status_bar
+    @status_buffer[1] = " "*@width
+    print_to_buffer(@status_buffer, 1, 0,  "Money: #{@city.coins}c")
+    print_to_buffer(@status_buffer, 1, 18, "Population: #{@city.population}")
+  end
 
-  private
+  def update_cursor(x,y)
+    c = VIM::evaluate("getpos('.')")
+    previous_char = @last_char
+    print_to_buffer(@main_buffer, c[1], c[2], previous_char)
+
+    c[1] += y
+    c[1] = 1 if c[1] < 1
+    c[1] = @map.height+1 if c[1] >= @map.height+1
+
+    c[2] += x
+    c[2] = @map.offset if c[2] < @map.offset
+    c[2] = @map.width-(@map.offset-1) if c[2] >= (@map.width+@map.offset)
+
+    VIM::evaluate("cursor(#{c[1]},#{c[2]})")
+    #VIM::evaluate("setpos('.', [#{c[0]},#{c[1]},#{c[2]},#{c[3]}])")
+
+    @last_char = @main_buffer[c[1]][c[2]]
+    print_to_buffer(@main_buffer, c[1], c[2], " ")
+  end
 
   def wait_for_input(args)
     valid_input = args.split(",")
@@ -101,17 +119,4 @@ class VimCityGame
     return
   end
 
-  def blink_cursor
-    cursor_pos = VIM::evaluate("getpos('.')")
-    prev_char = @cursor_last
-    @cursor_last = @main_buffer[cursor_pos[1]][cursor_pos[2]]
-
-    if @cursor_last == '_'
-      print_to_buffer(@main_buffer, cursor_pos[2], cursor_pos[3], prev_char)
-    else
-      print_to_buffer(@main_buffer, cursor_pos[2], cursor_pos[3], '_')
-    end
-
-    redraw
-  end
 end

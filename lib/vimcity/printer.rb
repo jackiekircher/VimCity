@@ -1,10 +1,9 @@
 require_relative 'vim_wrapper'
 
 module Printer
-
   include VimWrapper
 
-  def print_to_buffer(buffer, x, y, str)
+  def print_to_buffer(buffer, y, x, str)
     x = (x < 0) ? 0 : x
     y = (y < 1) ? 1 : y
 
