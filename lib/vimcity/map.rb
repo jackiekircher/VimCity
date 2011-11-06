@@ -8,7 +8,7 @@ class Map
   def initialize(buffer)
     @buffer = buffer
     @offset = 1
-    @width = 200
+    @width = 150
     @height = 70
 
     empty_space= " "*@offset + "."*@width 
@@ -22,8 +22,4 @@ class Map
     redraw
   end
 
-  def add_building(building, y, x)
-    VIM::message("@buffer = #{@buffer.name}, current buffer = #{VIM::Buffer.current.name}")
-    print_area_to_buffer(VIM::Buffer.current, y, x, building.symbol)
-  end
 end
