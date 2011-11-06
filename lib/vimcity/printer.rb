@@ -24,6 +24,13 @@ module Printer
     return str.length
   end
 
+  def print_to_status_buffer(buffer, y, x, str)
+    VIM::evaluate("genutils#MoveCursorToWindow(1)")
+    @status_buffer[3] = " "*@width
+    print_to_buffer(buffer, y, x, str)
+    VIM::evaluate("genutils#MoveCursorToWindow(2)")
+  end
+
   def print_area_to_buffer(buffer, y, x, chars)
     height = chars.size
     width  = chars.first.size

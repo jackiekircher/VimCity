@@ -79,6 +79,9 @@ class VimCityGame
 
       elsif input == 'p'
         add_building
+
+      elsif input == 'x'
+        destroy_building
       end
 
       update_status_bar
@@ -102,17 +105,17 @@ class VimCityGame
   # :section: init
 
   def init_city
-    #load city stuff here when we get to it
-    @city = City.new()
+  #load city stuff here when we get to it
+  @city = City.new()
 
-    house1 = Seitch.new()
-    house1.add_to_city(@city)
-    @map.add_building(house1,34, 24)
-    print_area_to_buffer(@main_buffer, 34, 24, house1.symbol)
-    house2 = Seitch.new()
-    house2.add_to_city(@city)
-    @map.add_building(house1,34, 24)
-    print_area_to_buffer(@main_buffer, 35, 24, house2.symbol)
+  house1 = Seitch.new()
+  house1.add_to_city(@city)
+  @map.add_building(house1,34, 24)
+  print_area_to_buffer(@main_buffer, 34, 24, house1.symbol)
+  house2 = Seitch.new()
+  house2.add_to_city(@city)
+  @map.add_building(house1,34, 24)
+  print_area_to_buffer(@main_buffer, 35, 24, house2.symbol)
   end
 
   def init_cursor
@@ -125,10 +128,14 @@ class VimCityGame
   def update_status_bar
     VIM::evaluate("genutils#MoveCursorToWindow(1)")
     @status_buffer[1] = " "*@width
-    print_to_buffer(@status_buffer, 1, 0,  "Money: #{@city.coins.round}")
-    print_to_buffer(@status_buffer, 1, 18, "Population: #{@city.population.round} / #{@city.population_cap}")
-    #print_to_buffer(@status_buffer, 1, 36, "Population Cap: #{@city.population_cap}")
-    print_to_buffer(@status_buffer, 1, 40, "Oxygen: #{@city.oxygen.round}")
+    print_to_buffer(@status_buffer, 1, 0,
+                    "Money: #{@city.coins.round}")
+    print_to_buffer(@status_buffer, 1, 18,
+                    "Population: #{@city.population.round} / #{@city.population_cap}")
+    #print_to_buffer(@status_buffer, 1, 36,
+    #                "Population Cap: #{@city.population_cap}")
+    print_to_buffer(@status_buffer, 1, 40,
+                    "Oxygen: #{@city.oxygen.round}")
     VIM::evaluate("genutils#MoveCursorToWindow(2)")
   end
 
@@ -258,17 +265,32 @@ class VimCityGame
 
       # warn and return if failure
       return if failure
-      # warn and return if not enough coins
+      # warn and return if ont enough coins
       return if @city.coins < @current_building.cost
-      # warn and return if not enough free workers
-      return if @city.free_workers - @current_building.workers_required < 0
 
       # for deleting buildings
       # c = get_cursor_pos
       @current_building.add_to_city(@city)
+      c = get_cursor_pos
+      @map.add_building(@current_building, c[0], c[1])
       @last_chars = @current_building.symbol
     end
   end
+    
+  def destroy_building
+    c = get_cursor_pos
+    building, building_coords = @map.destroy_building(c[0], c[1])
+    return if building.nil?
 
+    blank_building =Array.new(building.height) { "."*building.width }
+    print_area_to_buffer(@main_buffer,
+                         building_coords[0],
+                         building_coords[1],
+                         blank_building)
+    @last_chars = cache_area(@main_buffer,
+                             c[0], building.height,
+                             c[1], building.width)
+    building.remove_from_city(@city)
+  end
 end
 
