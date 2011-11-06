@@ -12,7 +12,6 @@ class VimCityGame
     @width  = @window.width
 
     if @height < 20 || @width < 70
-      clear_screen
       VIM::message("Your window is too small, please resize it to at least 70x20")
       VIM::command('q!')
     else
@@ -43,13 +42,10 @@ class VimCityGame
   end
 
   def display_splash
-    clear_screen
-    print_to_screen(1,1,"foo")
     #TODO
   end
 
   def display_menu
-    clear_screen
     #TODO
   end
 

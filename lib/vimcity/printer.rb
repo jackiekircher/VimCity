@@ -12,13 +12,4 @@ module Printer
     return str.length
   end
 
-  def clear_screen
-    VIM::evaluate("genutils#OptClearBuffer()")
-    blank_line = " "*@width
-    @buffer[1] = blank_line
-    (1...@height).each do |line|
-      @buffer.append(line, blank_line)
-    end
-  end
-
 end
