@@ -94,7 +94,7 @@ class VimCityGame
     (1...VIM::Window.current.height).each do |i|
       @main_buffer.append(i, " "*(VIM::Window.current.width-1))
     end
-    ss = File.open("#{Dir.pwd}/lib/menu")
+    ss = File.open("#{Dir.pwd}/lib/menu.txt")
     ss_chars = []
     ss.each_line{|line| ss_chars << line}
     print_area_to_buffer(@main_buffer,
@@ -146,6 +146,7 @@ class VimCityGame
     print_to_buffer(@status_buffer, 1, 18, "Population: #{@city.population.round} / #{@city.population_cap}")
     #print_to_buffer(@status_buffer, 1, 36, "Population Cap: #{@city.population_cap}")
     print_to_buffer(@status_buffer, 1, 40, "Oxygen: #{@city.oxygen.round}")
+    print_to_buffer(@status_buffer, 2, 90, "- Press 'i' to make buildings - and 'x' to destroy them! -")
     VIM::evaluate("genutils#MoveCursorToWindow(2)")
   end
 
