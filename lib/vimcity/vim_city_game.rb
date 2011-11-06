@@ -26,7 +26,7 @@ class VimCityGame
     @height = @main_window.height
     @width  = @main_window.width
 
-    @map = Map.new(@main_buffer, 120, 300)
+    @map = Map.new(@main_buffer, 20, 20)
     @insert_mode = false
     @current_building = nil
 
@@ -108,13 +108,9 @@ class VimCityGame
   def init_city
     #load city stuff here when we get to it
     @city = City.new()
-
-    house1 = Seitch.new()
-    house1.add_to_city(@city)
-    @map.add_building(house1,34, 24)
-    house2 = Seitch.new()
-    house2.add_to_city(@city)
-    @map.add_building(house1,34, 24)
+    @city.coins = 13000
+    @city.population = 1000
+    @city.free_workers = 1000
   end
 
   def init_cursor
@@ -131,6 +127,7 @@ class VimCityGame
     @status_buffer.append(2, " "*@width)
     VIM::evaluate("genutils#MoveCursorToWindow(2)")
   end
+
   def update_status_bar
     VIM::evaluate("genutils#MoveCursorToWindow(1)")
     @status_buffer[1] = " "*@width
@@ -295,6 +292,7 @@ class VimCityGame
   def destroy_building
     c = get_cursor_pos
     building, building_coords = @map.destroy_building(c[0], c[1])
+    print "#{building}"
     return if building.nil?
 
     blank_building = Array.new(building.height) { "."*building.width }
