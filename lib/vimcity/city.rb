@@ -14,7 +14,7 @@ class City
   def update
     @coins+=@money_per_second
     if @population < @population_cap 
-	@population+=@people_per_second*@happiness
+	    @population+=@people_per_second*@happiness
     	@population=@population.round
     end
     @happiness-=0.001
