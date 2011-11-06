@@ -1,23 +1,36 @@
 class City
 
-  attr_accessor :coins, :population
-
-  def initialize(coins=1000, population=100)
+  attr_accessor :coins, :population, :population_cap, :people_per_second, :money_per_second, :oxygen, :atmogen
+  attr_accessor :free_workers
+ 
+  def initialize(coins=10000, population=0)
     @coins = coins
     @population = population
     @population_cap = 0
-    @money_per_second = 1
-    @people_per_second = 1
+    @free_workers = 0
+    @money_per_second = 0
+    @people_per_second = 0
+    @oxygen = 1000
+    @atmogen = 0
     @happiness = 1
   end
 
   def update
-    @coins+=@money_per_second
+    @coins+=@money_per_second/12.5 
+
     if @population < @population_cap 
-	    @population+=@people_per_second*@happiness
-    	@population=@population.round
+	@population+=@people_per_second/12.5*@happiness
+	@free_workers+=@people_per_second/12.5*@happiness
     end
-    @happiness-=0.001
+
+    @oxygen -= @population
+    
+    @coins -= @atmogen*10/12.5 if @oxygen < @atmogen.round*2000
+
+    @oxygen += @atmogen*30/12.5 if @oxygen < @atmogen * 2000
+    @oxygen=0 if @oxygen < 0
+
+    #@happiness-=0.001
     @happiness = 0.001 if @happiness < 0
   end
 

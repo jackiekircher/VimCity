@@ -26,7 +26,7 @@ class VimCityGame
     @height = @main_window.height
     @width  = @main_window.width
 
-    @map = Map.new(@main_buffer, 20, 300)
+    @map = Map.new(@main_buffer, 120, 300)
     @insert_mode = false
     @current_building = nil
 
@@ -102,9 +102,15 @@ class VimCityGame
   # :section: init
 
   def init_city
-    # load city stuff here when we get to it
-
+    #load city stuff here when we get to it
     @city = City.new()
+
+    house1 = Seitch.new()
+    house1.add_to_city(@city)
+    @map.add_building(house1,34, 24)
+    house2 = Seitch.new()
+    house2.add_to_city(@city)
+    @map.add_building(house1,34, 24)
   end
 
   def init_cursor
@@ -117,8 +123,10 @@ class VimCityGame
   def update_status_bar
     VIM::evaluate("genutils#MoveCursorToWindow(1)")
     @status_buffer[1] = " "*@width
-    print_to_buffer(@status_buffer, 1, 0,  "Money: #{@city.coins}c")
-    print_to_buffer(@status_buffer, 1, 18, "Population: #{@city.population}")
+    print_to_buffer(@status_buffer, 1, 0,  "Money: #{@city.coins.round}")
+    print_to_buffer(@status_buffer, 1, 18, "Population: #{@city.population.round} / #{@city.population_cap}")
+    #print_to_buffer(@status_buffer, 1, 36, "Population Cap: #{@city.population_cap}")
+    print_to_buffer(@status_buffer, 1, 40, "Oxygen: #{@city.oxygen.round}")
     VIM::evaluate("genutils#MoveCursorToWindow(2)")
   end
 
@@ -206,7 +214,7 @@ class VimCityGame
                            building.symbol)
       redraw
 
-      input = wait_for_input(["\t","\r"," "])
+      input = wait_for_input(["\t","\r"," ","q"])
       if input == "\t"
         # cycle through buildings
         select += 1
@@ -248,8 +256,10 @@ class VimCityGame
 
       # warn and return if failure
       return if failure
-      # warn and return if ont enough coins
+      # warn and return if not enough coins
       return if @city.coins < @current_building.cost
+      # warn and return if not enough free workers
+      return if @city.free_workers - @current_building.workers_required < 0
 
       # for deleting buildings
       # c = get_cursor_pos
