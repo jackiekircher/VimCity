@@ -1,14 +1,24 @@
 class Map
 
-  def initialize(buffer=VIM::Buffer.current)
+  include Printer
+
+  def initialize(buffer)
     @buffer = buffer
-    for i in 1..VIM::Window.current.height
-      
+    @map_offset = 5
+    @map_width = 40
+    @map_height = 20
+
+    empty_space= " "*@map_offset + "O"*@map_width 
+    
+    @buffer[1]=empty_space
+
+    (0...@map_height).each do |line|
+      @buffer.append(line,empty_space)  
     end
+
+    redraw
   end
 
   def add_building(x,y,type)
-    building = BuildingFactory.new(type)
-    building.add_to_map(buffer, x, y height, size)
- end
+  end
 end

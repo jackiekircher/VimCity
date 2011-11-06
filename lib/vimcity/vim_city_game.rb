@@ -1,4 +1,3 @@
-require_relative 'vim_wrapper'
 require_relative 'printer'
 
 class VimCityGame
@@ -21,6 +20,8 @@ class VimCityGame
   end
 
   def start_game
+    Map.new(@main_buffer)
+
     display_splash
     #wait_for_input("any")
     display_menu
