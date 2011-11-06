@@ -35,7 +35,6 @@ class VimCityGame
   def start_game
 
     display_splash
-    #wait_for_input("any")
     display_menu
 
     init_city
@@ -63,6 +62,9 @@ class VimCityGame
         update_cursor(0,-1)
       elsif input == 'l'
         update_cursor(1,0)
+
+      elsif input == 'i'
+        building_menu
       end
 
       update_status_bar
@@ -80,6 +82,9 @@ class VimCityGame
 
 
   private
+
+  ##
+  # :section: init
 
   def init_city
     # load city stuff here when we get to it
@@ -122,17 +127,33 @@ class VimCityGame
     print_to_buffer(@main_buffer, c[1], c[2], " ")
   end
 
-  def wait_for_input(args)
-    valid_input = args.split(",")
-    if valid_input.first == "any"
-      VIM::evaluate("getchar()")
+  def wait_for_input(valid_input)
+    return if Array.new(valid_input).empty?
+
+    if valid_input.include?("any")
+      char = VIM::evaluate("getchar()")
     else
       while true
-        break if valid_input.include?(VIM::evaluate("getchar()"))
+        char = VIM::evaluate("getchar()")
+        break if valid_input.include?(char.chr)
       end
     end
 
-    return
+    return char.chr
+  end
+
+  def building_menu
+    while true
+      input = wait_for_input(["\t","\r"," "])
+      if input == "\t"
+        # cycle through buildings
+      elsif input == "\r"
+        # select building
+        return
+      else
+        return
+      end
+    end
   end
 
 end
