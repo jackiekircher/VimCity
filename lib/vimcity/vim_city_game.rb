@@ -26,7 +26,7 @@ class VimCityGame
     @height = @main_window.height
     @width  = @main_window.width
 
-    @map = Map.new(@main_buffer)
+    @map = Map.new(@main_buffer, 20, 300)
 
 
     VIM::evaluate("genutils#MoveCursorToWindow(2)") #oh hey, 2 is the lower panel ./sigh
@@ -119,11 +119,11 @@ class VimCityGame
 
     c[1] += y
     c[1] = 1 if c[1] < 1
-    c[1] = @map.height+1 if c[1] >= @map.height+1
+    c[1] = @map.height+2-cursor_height if c[1]+cursor_height >= @map.height+2
 
     c[2] += x
     c[2] = @map.offset if c[2] < @map.offset
-    c[2] = @map.width-(@map.offset-1) if c[2] >= (@map.width+@map.offset)
+    c[2] = @map.width-(@map.offset)-cursor_width+2 if c[2]+cursor_width >= (@map.width+@map.offset+1)
 
     VIM::evaluate("cursor(#{c[1]},#{c[2]})")
 

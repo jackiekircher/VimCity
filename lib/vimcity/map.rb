@@ -5,11 +5,11 @@ class Map
 
   include Printer
 
-  def initialize(buffer)
+  def initialize(buffer, width=200,  height=70)
     @buffer = buffer
     @offset = 1
-    @width = 200
-    @height = 70
+    @width = width
+    @height = height
 
     empty_space= " "*@offset + "."*@width 
     
