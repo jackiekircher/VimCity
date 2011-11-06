@@ -34,7 +34,6 @@ class Map
   end
 
   def destroy_building(y, x)
-    print @buildings_grid
     return nil if @buildings_grid[y][x] == " "
 
     if @buildings_grid[y][x].kind_of? Building
@@ -46,8 +45,10 @@ class Map
     end
 
     if building && coords
-      (coords[0]...(coords[0]+building.height)).each do |line|
-        @buildings_grid[line] = Array.new(building.width) {" "}
+      (coords[0]...(coords[0]+building.height)).each do |row|
+        (coords[1]...(coords[1]+building.width)).each do |col|
+          @buildings_grid[row][col] = " "
+        end
       end
     end
 

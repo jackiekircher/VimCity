@@ -26,7 +26,7 @@ class VimCityGame
     @height = @main_window.height
     @width  = @main_window.width
 
-    @map = Map.new(@main_buffer, 120, 300)
+    @map = Map.new(@main_buffer, 20, 20)
     @insert_mode = false
     @current_building = nil
 
@@ -41,6 +41,7 @@ class VimCityGame
     display_menu
 
     init_city
+    init_status_bar
     update_status_bar
 
     init_cursor
@@ -79,6 +80,9 @@ class VimCityGame
 
       elsif input == 'p'
         add_building
+
+      elsif input == 'x'
+        destroy_building
       end
 
       update_status_bar
@@ -135,13 +139,21 @@ class VimCityGame
     print_area_to_buffer(@main_buffer, c[0], c[1], @cursor)
   end
 
+  def init_status_bar
+    VIM::evaluate("genutils#MoveCursorToWindow(1)")
+    @status_buffer[1] = " "*@width
+    @status_buffer.append(1, " "*@width)
+    @status_buffer.append(2, " "*@width)
+    VIM::evaluate("genutils#MoveCursorToWindow(2)")
+  end
+
   def update_status_bar
     VIM::evaluate("genutils#MoveCursorToWindow(1)")
     @status_buffer[1] = " "*@width
     print_to_buffer(@status_buffer, 1, 0,  "Money: #{@city.coins.round}")
     print_to_buffer(@status_buffer, 1, 18, "Population: #{@city.population.round} / #{@city.population_cap}")
-    print_to_buffer(@status_buffer, 1, 40, "Free Workers: #{@city.free_workers.round}")
-    print_to_buffer(@status_buffer, 1, 87, "Oxygen: #{@city.oxygen.round}")
+    #print_to_buffer(@status_buffer, 1, 36, "Population Cap: #{@city.population_cap}")
+    print_to_buffer(@status_buffer, 1, 40, "Oxygen: #{@city.oxygen.round}")
     VIM::evaluate("genutils#MoveCursorToWindow(2)")
   end
 
@@ -263,26 +275,55 @@ class VimCityGame
   end
 
   def add_building
+    return unless @insert_mode && @current_building
 
-    if @insert_mode && @current_building
-      failure = false
-      @last_chars.each do |row|
-        failure = true if row != "."*@current_building.width
-      end
-
-      # warn and return if failure
-      return if failure
-      # warn and return if not enough coins
-      return if @city.coins < @current_building.cost
-      # warn and return if not enough free workers
-      return if @city.free_workers - @current_building.workers_required < 0
-
-      # for deleting buildings
-      # c = get_cursor_pos
-      @current_building.add_to_city(@city)
-      @last_chars = @current_building.symbol
+    failure = false
+    @last_chars.each do |row|
+      failure = true if row != "."*@current_building.width
     end
-  end
 
+    # warn and return if failure
+    if failure
+      print_to_status_buffer(@status_buffer, 3, 0,
+                             "You cannot place that building there!")
+      return
+    end
+
+    # warn and return if not enough coins
+    if @city.coins < @current_building.cost
+      print_to_status_buffer(@status_buffer, 3, 0,
+                             "You require more coins to construct that building.")
+      return
+    end
+
+    # warn and return if not enough free workers
+    if @city.free_workers - @current_building.workers_required < 0
+      print_to_status_buffer(@status_buffer, 3, 0,
+                             "You do not have the citizens to optimally operate that facility!")
+      return
+    end
+
+    @current_building.add_to_city(@city)
+    c = get_cursor_pos
+    @map.add_building(@current_building, c[0], c[1])
+    @last_chars = @current_building.symbol
+  end
+    
+  def destroy_building
+    c = get_cursor_pos
+    building, building_coords = @map.destroy_building(c[0], c[1])
+    print "#{building}"
+    return if building.nil?
+
+    blank_building = Array.new(building.height) { "."*building.width }
+    print_area_to_buffer(@main_buffer,
+                         building_coords[0],
+                         building_coords[1],
+                         blank_building)
+    @last_chars = cache_area(@main_buffer,
+                             c[0], building.height,
+                             c[1], building.width)
+    building.remove_from_city(@city)
+  end
 end
 
