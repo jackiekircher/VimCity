@@ -28,6 +28,8 @@ class VimCityGame
 
     @map = Map.new(@main_buffer)
 
+    @cursor = " "
+
     VIM::evaluate("genutils#MoveCursorToWindow(2)") #oh hey, 2 is the lower panel ./sigh
     start_game
   end
@@ -95,7 +97,7 @@ class VimCityGame
   def init_cursor
     c = VIM::evaluate("getpos('.')")
     @last_char = @main_buffer[c[1]][c[2]]
-    print_to_buffer(@main_buffer, c[1], c[2], '.')
+    print_to_buffer(@main_buffer, c[1], c[2], "#{@cursor}")
   end
 
   def update_status_bar
@@ -124,7 +126,7 @@ class VimCityGame
     #VIM::evaluate("setpos('.', [#{c[0]},#{c[1]},#{c[2]},#{c[3]}])")
 
     @last_char = @main_buffer[c[1]][c[2]]
-    print_to_buffer(@main_buffer, c[1], c[2], " ")
+    print_to_buffer(@main_buffer, c[1], c[2], "#{@cursor}")
   end
 
   def wait_for_input(valid_input)
@@ -143,17 +145,31 @@ class VimCityGame
   end
 
   def building_menu
+    buildings = Building::BUILDING_TYPES.dup
+    select = buildings.count
+    buildings << "none"
+
     while true
+      #building preview
+      if buildings[select] == "none"
+      else
+        building = Kernel.const_get(buildings[select]).new
+      end
+
       input = wait_for_input(["\t","\r"," "])
       if input == "\t"
         # cycle through buildings
+        select += 1
+        select  = 0 if select > (buildings.size - 1)
       elsif input == "\r"
         # select building
+        @cursor = building.symbol if building
         return
       else
         return
       end
     end
+
   end
 
 end
