@@ -16,4 +16,7 @@ class Building
     city.population_cap += self.capacity
     city.free_workers-= self.workers_required
   end
+
+  def remove_from_city(city)
+  end
 end
