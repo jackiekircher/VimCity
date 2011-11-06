@@ -26,7 +26,7 @@ class VimCityGame
     @height = @main_window.height
     @width  = @main_window.width
 
-    @map = Map.new(@main_buffer, 20, 20)
+    @map = Map.new(@main_buffer, 120, 300)
     @insert_mode = false
     @current_building = nil
 
@@ -152,7 +152,6 @@ class VimCityGame
     @status_buffer[1] = " "*@width
     print_to_buffer(@status_buffer, 1, 0,  "Money: #{@city.coins.round}")
     print_to_buffer(@status_buffer, 1, 18, "Population: #{@city.population.round} / #{@city.population_cap}")
-    #print_to_buffer(@status_buffer, 1, 36, "Population Cap: #{@city.population_cap}")
     print_to_buffer(@status_buffer, 1, 40, "Oxygen: #{@city.oxygen.round}")
     VIM::evaluate("genutils#MoveCursorToWindow(2)")
   end

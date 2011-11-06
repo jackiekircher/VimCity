@@ -11,4 +11,9 @@ class Seitch < Building
     @bonuses = "none"
   end
 
+  def remove_from_city(city)
+    super(city)
+    city.population = city.population_cap if city.population > city.population_cap
+  end
+
 end

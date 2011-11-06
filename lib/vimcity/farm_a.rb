@@ -6,7 +6,7 @@ class FarmA < Building
                '~v~~V~']
     @height = 3
     @width  = 6
-    @cost   = 300
+    @cost   = 1000
     @capacity = 0
     @workers_required = 10
     @description = "Produces purple grass, a desirable commodity"

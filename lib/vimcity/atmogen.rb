@@ -2,7 +2,7 @@ class AtmoGen < Building
 
   def initialize
     @symbol = ['o|o',
-               '|o|']
+		 '|o|']
     @height = 2
     @width  = 3
     @cost   = 1000
@@ -21,5 +21,4 @@ class AtmoGen < Building
     city.atmogen-=1
     super(city)
   end
-
 end
