@@ -1,4 +1,3 @@
-require_relative 'vim_wrapper'
 require_relative 'printer'
 
 class VimCityGame
@@ -24,6 +23,8 @@ class VimCityGame
     display_splash
     wait_for_input("any")
     display_menu
+
+    Map.new(@buffer)
 
     # start game loop
     while true

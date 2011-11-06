@@ -1,4 +1,8 @@
+require_relative 'vim_wrapper'
+
 module Printer
+
+  include VimWrapper
 
   def print_to_screen(x, y, str)
     x = (x < 0) ? 0 : x
