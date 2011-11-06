@@ -25,9 +25,9 @@ class City
 
     @oxygen -= @population/12.5
     
-    @coins -= @atmogen*2/12.5 if @oxygen < @atmogen.round*2000
+    @coins -= @atmogen*2/12.5 if @oxygen < @atmogen.round*1500
 
-    @oxygen += @atmogen*100/12.5 if @oxygen < @atmogen * 2000
+    @oxygen += @atmogen*100/12.5 if @oxygen < @atmogen * 1500
     @oxygen=0 if @oxygen < 0
 
     #@happiness-=0.001

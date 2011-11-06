@@ -163,7 +163,8 @@ class VimCityGame
     @status_buffer[1] = " "*@width
     print_to_buffer(@status_buffer, 1, 0,  "Money: #{@city.coins.round}")
     print_to_buffer(@status_buffer, 1, 18, "Population: #{@city.population.round} / #{@city.population_cap}")
-    print_to_buffer(@status_buffer, 1, 40, "Oxygen: #{@city.oxygen.round}")
+    print_to_buffer(@status_buffer, 1, 40, "Free people: #{@city.free_workers.round}")
+    print_to_buffer(@status_buffer, 1, 60, "Oxygen: #{@city.oxygen.round}")
     print_to_buffer(@status_buffer, 2, 90, "- Press 'i' to make buildings - and 'x' to destroy them! -")
     VIM::evaluate("genutils#MoveCursorToWindow(2)")
   end
