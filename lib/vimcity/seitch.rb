@@ -5,7 +5,9 @@ class Seitch < Building
     @height = 1
     @width  = 1
     @cost   = 100
-    @description = "A_simple_house"
+    @capacity = 10
+    @description = "A simple house"
+    @bonuses = "none"
   end
 
 end

@@ -148,16 +148,16 @@ class VimCityGame
     
     buffer = popup_buffer('new_building', 44)
 
-    window = VIM::Window.current
-    (1...window.height).each do |line|
-      buffer.append(line, " "*window.width)
+    w = VIM::Window.current
+    (1...w.height).each do |line|
+      buffer.append(line, " "*w.width)
     end
-    buffer[1] = "--------------------------------------------"
-    buffer[2] = "--- press tab to view all building types ---"
-    buffer[3] = "--------------------------------------------"
-    buffer[4] = "---        press space to cancel         ---"
-    buffer[5] = "--------------------------------------------"
-    redraw
+    buffer[1]  = "--------------------------------------------"
+    buffer[2]  = "--- press tab to view all building types ---"
+    buffer[3]  = "--------------------------------------------"
+    buffer[4]  = "---        press space to cancel         ---"
+    buffer[5]  = "--------------------------------------------"
+
 
     buildings = Building::BUILDING_TYPES
     select = 0
@@ -165,6 +165,17 @@ class VimCityGame
     while true
       #building preview
       building = Kernel.const_get(buildings[select]).new
+      buffer[w.height] = "--------------------------------------------"
+      buffer[w.height-3] = "  Bonuses: #{building.bonuses}"
+      buffer[w.height-4] = "  Capacity: #{building.capacity}"
+      buffer[w.height-5] = "  Cost: #{building.cost}"
+      buffer[w.height-7] = "  #{building.description}"
+
+      print_to_buffer(buffer,
+                      (w.height/2)-(2+building.height/2),
+                      (w.width/2)-(building.width/2),
+                      building.symbol)
+      redraw
 
       input = wait_for_input(["\t","\r"," "])
       if input == "\t"

@@ -8,8 +8,8 @@ class Map
   def initialize(buffer)
     @buffer = buffer
     @offset = 1
-    @width = 40
-    @height = 20
+    @width = 200
+    @height = 70
 
     empty_space= " "*@offset + "."*@width 
     
