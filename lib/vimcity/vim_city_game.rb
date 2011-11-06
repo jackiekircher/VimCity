@@ -1,4 +1,9 @@
+require_relative 'vim_wrapper'
+require_relative 'printer'
+
 class VimCityGame
+  include VimWrapper
+  include Printer
 
   def initialize(buffer=VIM::Buffer.current)
     @buffer = buffer
@@ -39,6 +44,7 @@ class VimCityGame
 
   def display_splash
     clear_screen
+    print_to_screen(1,1,"foo")
     #TODO
   end
 
@@ -49,27 +55,6 @@ class VimCityGame
 
 
   private
-
-  def print_to_screen(x, y, str)
-    x = (x < 0) ? 0 : x
-    y = (y < 1) ? 1 : y
-
-    new_line = @buffer[y]
-    new_line[x, str.length] = str
-    @buffer[y] = new_line
-    redraw
-
-    return str.length
-  end
-
-  def clear_screen
-    VIM::evaluate("genutils#OptClearBuffer()")
-    blank_line = " "*@width
-    @buffer[1] = blank_line
-    (1...@height).each do |line|
-      @buffer.append(line, blank_line)
-    end
-  end
 
   def wait_for_input(args)
     valid_input = args.split(",")
@@ -84,26 +69,4 @@ class VimCityGame
     return
   end
 
-  def redraw
-    VIM::command("redraw")
-  end
-
-  def get_char(timeout)
-    char = VIM::evaluate("getchar(#{timeout})")
-    return nil if char.nil?
-
-    char.chr
-  end
-
-  def prompt(question)
-    return VIM::evaluate("input('#{question}')").chomp
-  end
-
-  def wait(time)
-    VIM::command("sleep #{time}m")
-  end
-
-  def quit
-    VIM::command('q!')
-  end
 end
