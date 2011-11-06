@@ -7,7 +7,7 @@ class City
     @coins = coins
     @population = population
     @population_cap = 0
-    @free_workers = 0
+    @free_workers = population
     @money_per_second = 0
     @people_per_second = 0
     @oxygen = 1000
@@ -23,11 +23,11 @@ class City
 	@free_workers+=@people_per_second/12.5*@happiness
     end
 
-    @oxygen -= @population
+    @oxygen -= @population/5
     
-    @coins -= @atmogen*10/12.5 if @oxygen < @atmogen.round*2000
+    @coins -= @atmogen*5/12.5 if @oxygen < @atmogen.round*2000
 
-    @oxygen += @atmogen*30/12.5 if @oxygen < @atmogen * 2000
+    @oxygen += @atmogen*100/12.5 if @oxygen < @atmogen * 2000
     @oxygen=0 if @oxygen < 0
 
     #@happiness-=0.001

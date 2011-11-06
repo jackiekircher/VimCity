@@ -105,17 +105,33 @@ class VimCityGame
   # :section: init
 
   def init_city
-  #load city stuff here when we get to it
-  @city = City.new()
+    #load city stuff here when we get to it
+    @city = City.new(5000, 100)
 
-  house1 = Seitch.new()
-  house1.add_to_city(@city)
-  @map.add_building(house1,34, 24)
-  print_area_to_buffer(@main_buffer, 34, 24, house1.symbol)
-  house2 = Seitch.new()
-  house2.add_to_city(@city)
-  @map.add_building(house1,34, 24)
-  print_area_to_buffer(@main_buffer, 35, 24, house2.symbol)
+    house1 = Seitch.new()
+    house1.add_to_city(@city)
+    @map.add_building(house1,34, 24)
+    print_area_to_buffer(@main_buffer, 34, 24, house1.symbol)
+    house2 = Seitch.new()
+    house2.add_to_city(@city)
+    @map.add_building(house2,34, 24)
+    print_area_to_buffer(@main_buffer, 35, 24, house2.symbol)
+    house3 = Seitch.new()
+    house3.add_to_city(@city)
+    @map.add_building(house3,34, 24)
+    print_area_to_buffer(@main_buffer, 34, 25, house3.symbol)
+    starport = Starport.new()
+    starport .add_to_city(@city)
+    @map.add_building(starport,30, 30)
+    print_area_to_buffer(@main_buffer, 30, 30, starport.symbol)
+    farm = FarmA.new()
+    farm .add_to_city(@city)
+    @map.add_building(farm ,37, 24)
+    print_area_to_buffer(@main_buffer, 37, 24, farm.symbol)
+    atmo = AtmoGen.new()
+    atmo .add_to_city(@city)
+    @map.add_building(atmo ,38, 26)
+    print_area_to_buffer(@main_buffer, 34, 30, atmo .symbol)
   end
 
   def init_cursor
@@ -132,9 +148,9 @@ class VimCityGame
                     "Money: #{@city.coins.round}")
     print_to_buffer(@status_buffer, 1, 18,
                     "Population: #{@city.population.round} / #{@city.population_cap}")
-    #print_to_buffer(@status_buffer, 1, 36,
-    #                "Population Cap: #{@city.population_cap}")
     print_to_buffer(@status_buffer, 1, 40,
+                    "Free Workers: #{@city.free_workers.round}")
+    print_to_buffer(@status_buffer, 1, 87,
                     "Oxygen: #{@city.oxygen.round}")
     VIM::evaluate("genutils#MoveCursorToWindow(2)")
   end

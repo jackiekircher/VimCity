@@ -8,7 +8,7 @@ class FarmA < Building
     @width  = 6
     @cost   = 1000
     @capacity = 0
-    @workers_required = 20
+    @workers_required = 10
     @description = "Produces purple grass, a desirable commodity"
     @bonuses = "Goods sell for 2c a worker, maximum of 20"
   end
