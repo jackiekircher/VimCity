@@ -1,4 +1,4 @@
-" görillas.vim : a remake of the classic game 'Gorillas.bat'
+" vimcity.vim  : something something'
 " Version      : 0.1
 " Maintainer   : jackie kircher <kircher.jackie@gmail.com>
 " License      : WTFPL
@@ -56,9 +56,22 @@ endfunction
 function! s:play()
   " create a new window and overwrite vim configurations as needed
   exec "tabnew VimCity"
-  call genutils#SetupScratchBuffer()
   setlocal noreadonly
   setlocal nonumber
+  setlocal noswapfile
+  setlocal buftype=nofile
+  "call genutils#SetupScratchBuffer()
+
+  exec "sp Welcome_to_VimCity"
+  exec "resize 1"
+  "call genutils#SetupScratchBuffer()
+  setlocal noreadonly
+  setlocal nonumber
+  setlocal noswapfile
+  setlocal buftype=nofile
+  "call genutils#SetupScratchBuffer()
+
+  "
 
   " load the game!
   ruby load "lib/vimcity.rb"
