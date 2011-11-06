@@ -54,16 +54,15 @@ function! vimcity#vimcity()
 endfunction
 
 function! s:play()
-  exec "tabnew Welcome_to_VimCity"
-  "call genutils#SetupScratchBuffer()
+  exec "tabnew VimCity"
   setlocal noreadonly
   setlocal nonumber
   setlocal noswapfile
   setlocal buftype=nofile
   setlocal nowrap
 
-  exec "sp VimCity"
-  exec "resize 200"
+  exec "sp Welcome_to_VimCity"
+  exec "resize 1"
   setlocal noreadonly
   setlocal nonumber
   setlocal noswapfile

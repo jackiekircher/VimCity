@@ -11,11 +11,24 @@ class VimCityGame
       @status_buffer = buffer if buffer_name == "Welcome_to_VimCity"
     end
 
-    @window = VIM::Window.current
-    @height = @window.height
-    @width  = @window.width
+    (0...VIM::Window.count).each do |w|
+      window = VIM::Window[w]
+      if window.buffer == @main_buffer
+        @main_window = window
+        @main_window_n = w
+      end
+      if window.buffer == @status_buffer
+        @status = window
+        @status_window_n = w
+      end
+    end
+
+    @height = @main_window.height
+    @width  = @main_window.width
 
     @map = Map.new(@main_buffer)
+
+    VIM::evaluate("genutils#MoveCursorToWindow(2)") #oh hey, 2 is the lower panel ./sigh
     start_game
   end
 
@@ -81,9 +94,12 @@ class VimCityGame
   end
 
   def update_status_bar
+    VIM::evaluate("genutils#MoveCursorToWindow(1)")
+    @city.coins +=1
     @status_buffer[1] = " "*@width
     print_to_buffer(@status_buffer, 1, 0,  "Money: #{@city.coins}c")
     print_to_buffer(@status_buffer, 1, 18, "Population: #{@city.population}")
+    VIM::evaluate("genutils#MoveCursorToWindow(2)")
   end
 
   def update_cursor(x,y)
