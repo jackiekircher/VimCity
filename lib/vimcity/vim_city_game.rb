@@ -27,6 +27,8 @@ class VimCityGame
     @width  = @main_window.width
 
     @map = Map.new(@main_buffer, 20, 300)
+    @insert_mode = false
+    @current_building = nil
 
 
     VIM::evaluate("genutils#MoveCursorToWindow(2)") #oh hey, 2 is the lower panel ./sigh
@@ -66,10 +68,33 @@ class VimCityGame
 
       elsif input == 'i'
         building_menu
+
+
+      elsif input == ' '
+        if @insert_mode
+          reset_cursor
+          @current_building = false
+          @insert_mode = false
+        end
+
+      elsif input == 'r'
+        VIM::message("receive p")
+        if @insert_mode && @current_building
+          failure = false
+          @last_chars.each do |row|
+            failure = true if row != "."*@current_building.width
+          end
+
+          if not failure
+            c = get_cursor_pos
+            @map.add_building(@current_building, c[0], c[1])
+          else
+          end
+        end
       end
 
       update_status_bar
-      wait 50
+      wait 80
     end
   end
 
@@ -95,9 +120,9 @@ class VimCityGame
 
   def init_cursor
     @cursor = [" "] #use an array for area cursors
-    c = VIM::evaluate("getpos('.')")
-    @last_chars = cache_area(@main_buffer, c[1], 1, c[2], 1)
-    print_area_to_buffer(@main_buffer, c[1], c[2], @cursor)
+    c = get_cursor_pos
+    @last_chars = cache_area(@main_buffer, c[0], 1, c[1], 1)
+    print_area_to_buffer(@main_buffer, c[0], c[1], @cursor)
   end
 
   def update_status_bar
@@ -110,27 +135,39 @@ class VimCityGame
   end
 
   def update_cursor(x,y)
-    c = VIM::evaluate("getpos('.')")
+    c = get_cursor_pos
 
     cursor_height = @cursor.size
     cursor_width  = @cursor.first.size
 
-    print_area_to_buffer(@main_buffer, c[1], c[2], @last_chars)
+    print_area_to_buffer(@main_buffer, c[0], c[1], @last_chars)
 
-    c[1] += y
-    c[1] = 1 if c[1] < 1
-    c[1] = @map.height+2-cursor_height if c[1]+cursor_height >= @map.height+2
+    c[0] += y
+    c[0] = 1 if c[1] < 1
+    c[0] = @map.height+2-cursor_height if c[1]+cursor_height >= @map.height+2
 
-    c[2] += x
-    c[2] = @map.offset if c[2] < @map.offset
-    c[2] = @map.width-(@map.offset)-cursor_width+2 if c[2]+cursor_width >= (@map.width+@map.offset+1)
+    c[1] += x
+    c[1] = @map.offset if c[2] < @map.offset
+    c[1] = @map.width-(@map.offset)-cursor_width+2 if c[2]+cursor_width >= (@map.width+@map.offset+1)
 
-    VIM::evaluate("cursor(#{c[1]},#{c[2]})")
+    set_cursor_pos(c[0], c[1])
 
     @last_char = cache_area(@main_buffer,
-                            c[1], cursor_height,
-                            c[2], cursor_width)
-    print_area_to_buffer(@main_buffer, c[1], c[2], @cursor)
+                            c[0], cursor_height,
+                            c[1], cursor_width)
+    print_area_to_buffer(@main_buffer, c[0], c[1], @cursor)
+  end
+
+  def reset_cursor
+    c = get_cursor_pos
+    print_area_to_buffer(@main_buffer, c[0], c[1], @last_chars)
+    @last_chars = cache_area(@main_buffer,
+                             c[0], 1,
+                             c[1], 1)
+    @cursor = [" "]
+    print_area_to_buffer(@main_buffer, c[0], c[1], @cursor)
+
+    return
   end
 
   def wait_for_input(valid_input)
@@ -173,7 +210,7 @@ class VimCityGame
       buffer[w.height-3] = "  Bonuses: #{building.bonuses}"
       buffer[w.height-4] = "  Capacity: #{building.capacity}"
       buffer[w.height-5] = "  Cost: #{building.cost}"
-      buffer[w.height-7] = "  #{building.description}"
+      buffer[w.height-8] = "  #{building.description}"
 
       print_area_to_buffer(buffer,
                            (w.height/2)-(2+building.height/2),
@@ -194,13 +231,16 @@ class VimCityGame
         quit
 
         #c = VIM::Window.current.cursor
-        c = VIM::evaluate("getpos('.')")
-        print_area_to_buffer(@main_buffer, c[1], c[2], @last_chars)
+        c = get_cursor_pos
+        print_area_to_buffer(@main_buffer, c[0], c[1], @last_chars)
         @last_chars = cache_area(@main_buffer,
-                                 c[1], building.height,
-                                 c[2], building.width)
-        @cursor = building.symbol if building
-        print_area_to_buffer(@main_buffer, c[1], c[2], @cursor)
+                                 c[0], building.height,
+                                 c[1], building.width)
+        @cursor = building.symbol
+        print_area_to_buffer(@main_buffer, c[0], c[1], @cursor)
+
+        @insert_mode = true
+        @current_building = building
         return
       else
         break
