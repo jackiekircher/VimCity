@@ -26,10 +26,8 @@ class VimCityGame
     @height = @main_window.height
     @width  = @main_window.width
 
-    @map = Map.new(@main_buffer, 20, 20)
     @insert_mode = false
     @current_building = nil
-
 
     VIM::evaluate("genutils#MoveCursorToWindow(2)") #oh hey, 2 is the lower panel ./sigh
     start_game
@@ -40,6 +38,7 @@ class VimCityGame
     display_splash
     display_menu
 
+    @map = Map.new(@main_buffer, 20, 20)
     init_city
     init_status_bar
     update_status_bar
