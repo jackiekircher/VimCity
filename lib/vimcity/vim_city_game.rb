@@ -79,7 +79,8 @@ class VimCityGame
 
       elsif input == 'r'
         VIM::message("receive p")
-        if @insert_mode && @current_building
+	 if @insert_mode && @current_building
+	   @city.coins+=1000
           failure = false
           @last_chars.each do |row|
             failure = true if row != "."*@current_building.width
@@ -94,6 +95,7 @@ class VimCityGame
       end
 
       update_status_bar
+      @city.update()
       wait 80
     end
   end
@@ -127,7 +129,6 @@ class VimCityGame
 
   def update_status_bar
     VIM::evaluate("genutils#MoveCursorToWindow(1)")
-    @city.coins +=1
     @status_buffer[1] = " "*@width
     print_to_buffer(@status_buffer, 1, 0,  "Money: #{@city.coins}c")
     print_to_buffer(@status_buffer, 1, 18, "Population: #{@city.population}")
@@ -143,12 +144,12 @@ class VimCityGame
     print_area_to_buffer(@main_buffer, c[0], c[1], @last_chars)
 
     c[0] += y
-    c[0] = 1 if c[1] < 1
-    c[0] = @map.height+2-cursor_height if c[1]+cursor_height >= @map.height+2
+    c[0] = 1 if c[0] < 1
+    c[0] = @map.height+2-cursor_height if c[0]+cursor_height >= @map.height+2
 
     c[1] += x
-    c[1] = @map.offset if c[2] < @map.offset
-    c[1] = @map.width-(@map.offset)-cursor_width+2 if c[2]+cursor_width >= (@map.width+@map.offset+1)
+    c[1] = @map.offset if c[1] < @map.offset
+    c[1] = @map.width-(@map.offset)-cursor_width+2 if c[1]+cursor_width >= (@map.width+@map.offset+1)
 
     set_cursor_pos(c[0], c[1])
 
