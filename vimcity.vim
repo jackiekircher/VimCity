@@ -54,22 +54,24 @@ function! vimcity#vimcity()
 endfunction
 
 function! s:play()
-  " create a new window and overwrite vim configurations as needed
-  exec "tabnew VimCity"
+  exec "tabnew Welcome_to_VimCity"
+  "call genutils#SetupScratchBuffer()
   setlocal noreadonly
   setlocal nonumber
   setlocal noswapfile
   setlocal buftype=nofile
-  "call genutils#SetupScratchBuffer()
+  setlocal nowrap
 
-  exec "sp Welcome_to_VimCity"
-  exec "resize 1"
-  "call genutils#SetupScratchBuffer()
+  exec "sp VimCity"
+  exec "resize 200"
   setlocal noreadonly
   setlocal nonumber
   setlocal noswapfile
   setlocal buftype=nofile
-  "call genutils#SetupScratchBuffer()
+  setlocal nowrap
+
+  " would be nice if this worked...
+  "call genutils#MoveCursorToNextInWinStack('D')
 
   " load the game!
   ruby load "lib/vimcity.rb"

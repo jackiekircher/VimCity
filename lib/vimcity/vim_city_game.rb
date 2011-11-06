@@ -41,8 +41,25 @@ class VimCityGame
           return
         end
         redraw
+      elsif input == 'h'
+        c = VIM::evaluate("getpos('.')")
+        c[2] -= 1
+        VIM::evaluate("setpos('.', [#{c[0]},#{c[1]},#{c[2]},#{c[3]}])")
+      elsif input == 'j'
+        c = VIM::evaluate("getpos('.')")
+        c[1] -= 1
+        VIM::evaluate("setpos('.', [#{c[0]},#{c[1]},#{c[2]},#{c[3]}])")
+      elsif input == 'k'
+        c = VIM::evaluate("getpos('.')")
+        c[1] += 1
+        VIM::evaluate("setpos('.', [#{c[0]},#{c[1]},#{c[2]},#{c[3]}])")
+      elsif input == 'l'
+        c = VIM::evaluate("getpos('.')")
+        c[2] += 1
+        VIM::evaluate("setpos('.', [#{c[0]},#{c[1]},#{c[2]},#{c[3]}])")
       end
 
+      blink_cursor
       wait 50
     end
   end
@@ -84,4 +101,17 @@ class VimCityGame
     return
   end
 
+  def blink_cursor
+    cursor_pos = VIM::evaluate("getpos('.')")
+    prev_char = @cursor_last
+    @cursor_last = @main_buffer[cursor_pos[1]][cursor_pos[2]]
+
+    if @cursor_last == '_'
+      print_to_buffer(@main_buffer, cursor_pos[2], cursor_pos[3], prev_char)
+    else
+      print_to_buffer(@main_buffer, cursor_pos[2], cursor_pos[3], '_')
+    end
+
+    redraw
+  end
 end
