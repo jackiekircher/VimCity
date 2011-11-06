@@ -71,8 +71,6 @@ function! s:play()
   setlocal buftype=nofile
   "call genutils#SetupScratchBuffer()
 
-  "
-
   " load the game!
   ruby load "lib/vimcity.rb"
   ruby VimCityGame.new

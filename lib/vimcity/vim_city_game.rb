@@ -26,6 +26,7 @@ class VimCityGame
     #wait_for_input("any")
     display_menu
 
+    init_city
     init_status_bar
 
     # start game loop
@@ -55,9 +56,16 @@ class VimCityGame
     #TODO
   end
 
+  def init_city
+    # load city stuff here when we get to it
+
+    @city = City.new()
+  end
+
   def init_status_bar
     @status_buffer[1] = " "*@width
-    print_to_buffer(@status_buffer, 0, 1, "Money: 0c")
+    print_to_buffer(@status_buffer, 0, 1, "Money: #{@city.coins}c")
+    print_to_buffer(@status_buffer, 18, 1, "Population: #{@city.population}")
   end
 
 
