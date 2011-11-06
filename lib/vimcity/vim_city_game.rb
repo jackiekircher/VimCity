@@ -74,18 +74,28 @@ class VimCityGame
       elsif input == ' '
         if @insert_mode
           reset_cursor
+          @current_building = false
           @insert_mode = false
         end
 
-      elsif input == "\r"
-        if @insert_mode
-          c = VIM::Window.current.cursor
-          add_building()
+      elsif input == 'r'
+        VIM::message("receive p")
+        if @insert_mode && @current_building
+          failure = false
+          @last_chars.each do |row|
+            failure = true if row != "."*@current_building.width
+          end
+
+          if not failure
+            c = get_cursor_pos
+            @map.add_building(@current_building, c[0], c[1])
+          else
+          end
         end
       end
 
       update_status_bar
-      wait 50
+      wait 80
     end
   end
 
