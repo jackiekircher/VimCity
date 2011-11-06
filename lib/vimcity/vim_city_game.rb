@@ -5,24 +5,27 @@ class VimCityGame
   include VimWrapper
   include Printer
 
-  def initialize(buffer=VIM::Buffer.current)
-    @buffer = buffer
+  def initialize
+    (0...VIM::Buffer.count).each do |buffer|
+      buffer = VIM::Buffer[buffer]
+      buffer_name = (buffer.name) ? buffer.name.split("/").last : ""
+      @main_buffer = buffer if buffer_name == "VimCity"
+      @status_buffer = buffer if buffer_name == "Welcome_to_VimCity"
+    end
+
     @window = VIM::Window.current
     @height = @window.height
     @width  = @window.width
 
-    if @height < 20 || @width < 70
-      VIM::message("Your window is too small, please resize it to at least 70x20")
-      VIM::command('q!')
-    else
-      start_game
-    end
+    start_game
   end
 
   def start_game
     display_splash
-    wait_for_input("any")
+    #wait_for_input("any")
     display_menu
+
+    init_status_bar
 
     # start game loop
     while true
@@ -31,7 +34,8 @@ class VimCityGame
       if input == 'q' || input == '\x1b' #<ESC>
         response = prompt("Are you sure want to quit? (y/N) ")
         if response == 'y'
-          quit
+          quit #quit main buffer
+          quit #quit status buffer
           return
         end
         redraw
@@ -42,11 +46,17 @@ class VimCityGame
   end
 
   def display_splash
+    @main_buffer[1] = "foo"
     #TODO
   end
 
   def display_menu
     #TODO
+  end
+
+  def init_status_bar
+    @status_buffer[1] = " "*@width
+    print_to_buffer(@status_buffer, 0, 1, "Money: 0c")
   end
 
 
