@@ -286,9 +286,9 @@ class VimCityGame
       return
     end
 
-    # for deleting buildings
-    # c = get_cursor_pos
     @current_building.add_to_city(@city)
+    c = get_cursor_pos
+    @map.add_building(@current_building, c[0], c[1])
     @last_chars = @current_building.symbol
   end
     
@@ -297,7 +297,7 @@ class VimCityGame
     building, building_coords = @map.destroy_building(c[0], c[1])
     return if building.nil?
 
-    blank_building =Array.new(building.height) { "."*building.width }
+    blank_building = Array.new(building.height) { "."*building.width }
     print_area_to_buffer(@main_buffer,
                          building_coords[0],
                          building_coords[1],

@@ -34,7 +34,6 @@ class Map
   end
 
   def destroy_building(y, x)
-    print @buildings_grid
     return nil if @buildings_grid[y][x] == " "
 
     if @buildings_grid[y][x].kind_of? Building
