@@ -8,5 +8,5 @@ class Building
   attr_reader :description
   attr_reader :bonuses
 
-  BUILDING_TYPES = [:Seitch]
+  BUILDING_TYPES = [:Seitch, :FarmA, :Starport]
 end
