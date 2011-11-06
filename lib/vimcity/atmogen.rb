@@ -17,4 +17,9 @@ class AtmoGen < Building
     super(city)
   end
 
+  def remove_from_city(city)
+    city.atmogen-=1
+    super(city)
+  end
+
 end

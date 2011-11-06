@@ -18,5 +18,8 @@ class Building
   end
 
   def remove_from_city(city)
+    city.coins += self.cost/3
+    city.population_cap -= self.capacity
+    city.free_workers+= self.workers_required
   end
 end

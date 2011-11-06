@@ -18,4 +18,9 @@ class Starport < Building
     super(city)
   end
 
+  def remove_from_city(city)
+    city.people_per_second-=1
+    super(city)
+  end
+
 end

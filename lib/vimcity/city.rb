@@ -16,18 +16,18 @@ class City
   end
 
   def update
-    @coins+=@money_per_second/12.5 
+    @coins+=@money_per_second*2/12.5
 
     if @population < @population_cap 
 	@population+=@people_per_second/12.5*@happiness
 	@free_workers+=@people_per_second/12.5*@happiness
     end
 
-    @oxygen -= @population/5
+    @oxygen -= @population/12.5
     
-    @coins -= @atmogen*5/12.5 if @oxygen < @atmogen.round*2000
+    @coins -= @atmogen*2/12.5 if @oxygen < @atmogen.round*2000
 
-    @oxygen += @atmogen*100/12.5 if @oxygen < @atmogen * 2000
+    @oxygen += @atmogen*80/12.5 if @oxygen < @atmogen * 2000
     @oxygen=0 if @oxygen < 0
 
     #@happiness-=0.001

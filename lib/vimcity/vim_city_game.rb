@@ -103,33 +103,29 @@ class VimCityGame
 
   def init_city
     #load city stuff here when we get to it
-    @city = City.new(5000, 100)
+    @city = City.new(5900, 70)
 
-    house1 = Seitch.new()
-    house1.add_to_city(@city)
-    @map.add_building(house1,34, 24)
-    print_area_to_buffer(@main_buffer, 34, 24, house1.symbol)
-    house2 = Seitch.new()
-    house2.add_to_city(@city)
-    @map.add_building(house2,34, 24)
-    print_area_to_buffer(@main_buffer, 35, 24, house2.symbol)
-    house3 = Seitch.new()
-    house3.add_to_city(@city)
-    @map.add_building(house3,34, 24)
-    print_area_to_buffer(@main_buffer, 34, 25, house3.symbol)
+    house = Seitch.new()
+    init_building(house,34,24)
+    init_building(house,35,24)
+    init_building(house,34,25)
+    init_building(house,33,36)
+    init_building(house,34,37)
+    init_building(house,35,37)
+    init_building(house,36,37)
+    init_building(house,37,34)
     starport = Starport.new()
-    starport .add_to_city(@city)
-    @map.add_building(starport,30, 30)
-    print_area_to_buffer(@main_buffer, 30, 30, starport.symbol)
+    init_building(starport ,30,30)
     farm = FarmA.new()
-    farm .add_to_city(@city)
-    @map.add_building(farm ,37, 24)
-    print_area_to_buffer(@main_buffer, 37, 24, farm.symbol)
+    init_building(farm ,37,24)
     atmo = AtmoGen.new()
-    atmo .add_to_city(@city)
-    @map.add_building(atmo ,38, 26)
-    print_area_to_buffer(@main_buffer, 34, 30, atmo .symbol)
+    init_building(atmo ,34,30)
+  end
 
+  def init_building (building, y, x)
+    building.add_to_city(@city)
+    @map.add_building(building, y, x)
+    print_area_to_buffer(@main_buffer, y, x, building.symbol)
   end
 
   def init_cursor
@@ -222,7 +218,8 @@ class VimCityGame
       #building preview
       building = Kernel.const_get(buildings[select]).new
       buffer[w.height] = "--------------------------------------------"
-      buffer[w.height-3] = "  Bonuses: #{building.bonuses}"
+      buffer[w.height-2] = "  Bonuses: #{building.bonuses}"
+      buffer[w.height-3] = "  Workers Required: #{building.workers_required}"
       buffer[w.height-4] = "  Capacity: #{building.capacity}"
       buffer[w.height-5] = "  Cost: #{building.cost}"
       buffer[w.height-8] = "  #{building.description}"
