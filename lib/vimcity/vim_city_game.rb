@@ -80,6 +80,9 @@ class VimCityGame
 
       elsif input == 'p'
         add_building
+
+      elsif input == 'x'
+        destroy_building
       end
 
       update_status_bar
@@ -109,11 +112,9 @@ class VimCityGame
     house1 = Seitch.new()
     house1.add_to_city(@city)
     @map.add_building(house1,34, 24)
-    print_area_to_buffer(@main_buffer, 34, 24, house1.symbol)
     house2 = Seitch.new()
     house2.add_to_city(@city)
     @map.add_building(house1,34, 24)
-    print_area_to_buffer(@main_buffer, 35, 24, house2.symbol)
   end
 
   def init_cursor
@@ -277,7 +278,7 @@ class VimCityGame
                              "You require more coins to construct that building.")
       return
     end
-      
+
     # warn and return if not enough free workers
     if @city.free_workers - @current_building.workers_required < 0
       print_to_status_buffer(@status_buffer, 3, 0,
@@ -290,6 +291,21 @@ class VimCityGame
     @current_building.add_to_city(@city)
     @last_chars = @current_building.symbol
   end
+    
+  def destroy_building
+    c = get_cursor_pos
+    building, building_coords = @map.destroy_building(c[0], c[1])
+    return if building.nil?
 
+    blank_building =Array.new(building.height) { "."*building.width }
+    print_area_to_buffer(@main_buffer,
+                         building_coords[0],
+                         building_coords[1],
+                         blank_building)
+    @last_chars = cache_area(@main_buffer,
+                             c[0], building.height,
+                             c[1], building.width)
+    building.remove_from_city(@city)
+  end
 end
 
