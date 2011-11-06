@@ -78,7 +78,7 @@ class VimCityGame
           @insert_mode = false
         end
 
-      elsif input == 'r'
+      elsif input == 'p'
         VIM::message("receive p")
         if @insert_mode && @current_building
           failure = false
@@ -88,7 +88,7 @@ class VimCityGame
 
           if not failure
             c = get_cursor_pos
-            @map.add_building(@current_building, c[0], c[1])
+            @last_chars = @map.add_building(@current_building, c[0], c[1])
           else
           end
         end
@@ -153,9 +153,9 @@ class VimCityGame
 
     set_cursor_pos(c[0], c[1])
 
-    @last_char = cache_area(@main_buffer,
-                            c[0], cursor_height,
-                            c[1], cursor_width)
+    @last_chars = cache_area(@main_buffer,
+                             c[0], cursor_height,
+                             c[1], cursor_width)
     print_area_to_buffer(@main_buffer, c[0], c[1], @cursor)
   end
 
