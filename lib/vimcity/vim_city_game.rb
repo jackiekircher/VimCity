@@ -36,7 +36,6 @@ class VimCityGame
   def start_game
 
     display_splash
-    display_menu
 
     @map = Map.new(@main_buffer, 20, 20)
     init_city
@@ -91,11 +90,24 @@ class VimCityGame
   end
 
   def display_splash
-    #TODO
-  end
+    @main_buffer[1] = " "*(VIM::Window.current.width-1)
+    (1...VIM::Window.current.height).each do |i|
+      @main_buffer.append(i, " "*(VIM::Window.current.width-1))
+    end
+    ss = File.open("#{Dir.pwd}/lib/menu")
+    ss_chars = []
+    ss.each_line{|line| ss_chars << line}
+    print_area_to_buffer(@main_buffer,
+                         @height/2 - 9,
+                         @width/2 - 51,
+                         ss_chars)
 
-  def display_menu
-    #TODO
+    input = wait_for_input(["any"])
+    if input == 'q'
+      quit
+    else
+      clear_buffer(@main_buffer)
+    end
   end
 
 
