@@ -27,6 +27,7 @@ class VimCityGame
     @width  = @main_window.width
 
     @insert_mode = false
+    @current_building = nil
 
     @map = Map.new(@main_buffer)
 
@@ -110,9 +111,9 @@ class VimCityGame
 
   def init_cursor
     @cursor = [" "] #use an array for area cursors
-    c = VIM::evaluate("getpos('.')")
-    @last_chars = cache_area(@main_buffer, c[1], 1, c[2], 1)
-    print_area_to_buffer(@main_buffer, c[1], c[2], @cursor)
+    c = get_cursor_pos
+    @last_chars = cache_area(@main_buffer, c[0], 1, c[1], 1)
+    print_area_to_buffer(@main_buffer, c[0], c[1], @cursor)
   end
 
   def update_status_bar
@@ -125,37 +126,37 @@ class VimCityGame
   end
 
   def update_cursor(x,y)
-    c = VIM::evaluate("getpos('.')")
+    c = get_cursor_pos
 
     cursor_height = @cursor.size
     cursor_width  = @cursor.first.size
 
-    print_area_to_buffer(@main_buffer, c[1], c[2], @last_chars)
+    print_area_to_buffer(@main_buffer, c[0], c[1], @last_chars)
 
-    c[1] += y
-    c[1] = 1 if c[1] < 1
-    c[1] = @map.height+1 if c[1] >= @map.height+1
+    c[0] += y
+    c[0] = 1 if c[0] < 1
+    c[0] = @map.height+1 if c[0] >= @map.height+1
 
-    c[2] += x
-    c[2] = @map.offset if c[2] < @map.offset
-    c[2] = @map.width-(@map.offset-1) if c[2] >= (@map.width+@map.offset)
+    c[1] += x
+    c[1] = @map.offset if c[1] < @map.offset
+    c[1] = @map.width-(@map.offset-0) if c[1] >= (@map.width+@map.offset)
 
-    VIM::evaluate("cursor(#{c[1]},#{c[2]})")
+    set_cursor_pos(c[0], c[1])
 
     @last_char = cache_area(@main_buffer,
-                            c[1], cursor_height,
-                            c[2], cursor_width)
-    print_area_to_buffer(@main_buffer, c[1], c[2], @cursor)
+                            c[0], cursor_height,
+                            c[1], cursor_width)
+    print_area_to_buffer(@main_buffer, c[0], c[1], @cursor)
   end
 
   def reset_cursor
-    c = VIM::evaluate("getpos('.')")
-    print_area_to_buffer(@main_buffer, c[1], c[2], @last_chars)
+    c = get_cursor_pos
+    print_area_to_buffer(@main_buffer, c[0], c[1], @last_chars)
     @last_chars = cache_area(@main_buffer,
-                             c[1], 1,
-                             c[2], 1)
+                             c[0], 1,
+                             c[1], 1)
     @cursor = [" "]
-    print_area_to_buffer(@main_buffer, c[1], c[2], @cursor)
+    print_area_to_buffer(@main_buffer, c[0], c[1], @cursor)
 
     return
   end
@@ -221,15 +222,16 @@ class VimCityGame
         quit
 
         #c = VIM::Window.current.cursor
-        c = VIM::evaluate("getpos('.')")
-        print_area_to_buffer(@main_buffer, c[1], c[2], @last_chars)
+        c = get_cursor_pos
+        print_area_to_buffer(@main_buffer, c[0], c[1], @last_chars)
         @last_chars = cache_area(@main_buffer,
-                                 c[1], building.height,
-                                 c[2], building.width)
-        @cursor = building.symbol if building
-        print_area_to_buffer(@main_buffer, c[1], c[2], @cursor)
+                                 c[0], building.height,
+                                 c[1], building.width)
+        @cursor = building.symbol
+        print_area_to_buffer(@main_buffer, c[0], c[1], @cursor)
 
         @insert_mode = true
+        @current_building = building
         return
       else
         break

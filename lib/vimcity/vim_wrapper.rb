@@ -1,5 +1,13 @@
 module VimWrapper
 
+  def get_cursor_pos
+    return VIM::evaluate("getpos('.')")[1,2]
+  end
+
+  def set_cursor_pos(y,x)
+    return VIM::evaluate("cursor(#{y},#{x})")
+  end
+
   def redraw
     VIM::command("redraw")
   end
