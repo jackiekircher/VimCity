@@ -26,6 +26,8 @@ class VimCityGame
     @height = @main_window.height
     @width  = @main_window.width
 
+    @insert_mode = false
+
     @map = Map.new(@main_buffer)
 
 
@@ -66,6 +68,19 @@ class VimCityGame
 
       elsif input == 'i'
         building_menu
+
+
+      elsif input == ' '
+        if @insert_mode
+          reset_cursor
+          @insert_mode = false
+        end
+
+      elsif input == "\r"
+        if @insert_mode
+          c = VIM::Window.current.cursor
+          add_building()
+        end
       end
 
       update_status_bar
@@ -133,6 +148,18 @@ class VimCityGame
     print_area_to_buffer(@main_buffer, c[1], c[2], @cursor)
   end
 
+  def reset_cursor
+    c = VIM::evaluate("getpos('.')")
+    print_area_to_buffer(@main_buffer, c[1], c[2], @last_chars)
+    @last_chars = cache_area(@main_buffer,
+                             c[1], 1,
+                             c[2], 1)
+    @cursor = [" "]
+    print_area_to_buffer(@main_buffer, c[1], c[2], @cursor)
+
+    return
+  end
+
   def wait_for_input(valid_input)
     return if Array.new(valid_input).empty?
 
@@ -173,7 +200,7 @@ class VimCityGame
       buffer[w.height-3] = "  Bonuses: #{building.bonuses}"
       buffer[w.height-4] = "  Capacity: #{building.capacity}"
       buffer[w.height-5] = "  Cost: #{building.cost}"
-      buffer[w.height-7] = "  #{building.description}"
+      buffer[w.height-8] = "  #{building.description}"
 
       print_area_to_buffer(buffer,
                            (w.height/2)-(2+building.height/2),
@@ -201,6 +228,8 @@ class VimCityGame
                                  c[2], building.width)
         @cursor = building.symbol if building
         print_area_to_buffer(@main_buffer, c[1], c[2], @cursor)
+
+        @insert_mode = true
         return
       else
         break

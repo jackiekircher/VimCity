@@ -8,8 +8,8 @@ class Starport < Building
     @width  = 3
     @cost   = 2000
     @capacity = "N/A"
-    @description = "Allows for interstellar travelling"
-    @bonuses = "Helps boost your city's population"
+    @description = "Allows for interstellar travel"
+    @bonuses = "Boosts your city's population"
   end
 
 end
