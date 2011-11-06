@@ -20,13 +20,12 @@ class VimCityGame
   end
 
   def start_game
+    Map.new(@buffer)
+
     display_splash
     wait_for_input("any")
     display_menu
-
-    Map.new(@buffer)
-
-    # start game loop
+    
     while true
       input = get_char(0)
 
