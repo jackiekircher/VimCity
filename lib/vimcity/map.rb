@@ -22,8 +22,4 @@ class Map
     redraw
   end
 
-  def add_building(building, y, x)
-    VIM::message("@buffer = #{@buffer.name}, current buffer = #{VIM::Buffer.current.name}")
-    print_area_to_buffer(VIM::Buffer.current, y, x, building.symbol)
-  end
 end
