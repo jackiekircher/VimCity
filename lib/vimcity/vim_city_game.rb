@@ -20,7 +20,7 @@ class VimCityGame
   end
 
   def start_game
-    Map.new(@buffer)
+    Map.new(@main_buffer)
 
     display_splash
     #wait_for_input("any")

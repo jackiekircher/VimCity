@@ -1,18 +1,19 @@
-
-require_relative 'printer'
-
 class Map
 
   include Printer
 
-  def initialize(buffer=VIM::Buffer.current)
+  def initialize(buffer)
     @buffer = buffer
-    empty_line = "E"*VIM::Window.current.width
+    @map_offset = 5
+    @map_width = 40
+    @map_height = 20
 
-    @buffer[1]=empty_line
+    empty_space= " "*@map_offset + "O"*@map_width 
+    
+    @buffer[1]=empty_space
 
-    (1...VIM::Window.current.height).each do |line|
-      @buffer.append(line, empty_line)
+    (0...@map_height).each do |line|
+      @buffer.append(line,empty_space)  
     end
 
     redraw
