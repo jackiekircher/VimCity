@@ -2,7 +2,7 @@ class FarmA < Building
 
   def initialize
     @symbol = ['~~~~v~',
-               '~V~~~',
+               '~V~~~ ',
                '~v~~V~']
     @height = 3
     @width  = 6

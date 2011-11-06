@@ -22,8 +22,4 @@ class Map
     redraw
   end
 
-  def add_building(building, y, x)
-    #print_area_to_buffer(@buffer, y, x, building.symbol)
-    return building.symbol
-  end
 end

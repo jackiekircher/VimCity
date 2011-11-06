@@ -79,19 +79,7 @@ class VimCityGame
         end
 
       elsif input == 'p'
-        VIM::message("receive p")
-        if @insert_mode && @current_building
-          failure = false
-          @last_chars.each do |row|
-            failure = true if row != "."*@current_building.width
-          end
-
-          if not failure
-            c = get_cursor_pos
-            @last_chars = @map.add_building(@current_building, c[0], c[1])
-          else
-          end
-        end
+        add_building
       end
 
       update_status_bar
@@ -249,6 +237,26 @@ class VimCityGame
     end
 
     quit
+  end
+
+  def add_building
+
+    if @insert_mode && @current_building
+      failure = false
+      @last_chars.each do |row|
+        failure = true if row != "."*@current_building.width
+      end
+
+      # warn and return if failure
+      return if failure
+      # warn and return if ont enough coins
+      return if @city.coins < @current_building.cost
+
+      # for deleting buildings
+      # c = get_cursor_pos
+      @current_building.add_to_city(@city)
+      @last_chars = @current_building.symbol
+    end
   end
 
 end
