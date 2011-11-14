@@ -56,9 +56,9 @@ class VimCityGame
       input = get_char(0)
 
       # quit game
-      if input == 'q' || input == '\x1b' #<ESC>
-        response = prompt("Are you sure want to quit? (y/N) ")
-        if response == 'y'
+      if input == ':'
+        response = prompt(":")
+        if response == 'q'
           quit #quit main buffer
           quit #quit status buffer
           return
@@ -390,7 +390,7 @@ class VimCityGame
     buffer[9]  = "   i : place building (enter insert mode)   "
     buffer[10] = "   x : destroy building underneath          "
     buffer[11] = "       cursor                               "
-    buffer[12] = "   q : quit game                            "
+    buffer[12] = "   :q : quit game                           "
 
     buffer[14] = " -- while in insert mode --                 "
     buffer[15] = "   p : place building                       "
