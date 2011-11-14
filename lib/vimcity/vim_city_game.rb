@@ -30,9 +30,16 @@ class VimCityGame
     @current_building = nil
 
     VIM::evaluate("genutils#MoveCursorToWindow(2)") #oh hey, 2 is the lower panel ./sigh
+
+    # here we go!
     start_game
   end
 
+  
+  private
+
+  ##
+  # The main game loop
   def start_game
 
     display_splash
@@ -48,6 +55,7 @@ class VimCityGame
     while true
       input = get_char(0)
 
+      # quit game
       if input == 'q' || input == '\x1b' #<ESC>
         response = prompt("Are you sure want to quit? (y/N) ")
         if response == 'y'
@@ -55,7 +63,8 @@ class VimCityGame
           quit #quit status buffer
           return
         end
-        redraw
+
+      # cursor movement
       elsif input == 'h'
         update_cursor(-1,0)
       elsif input == 'j'
@@ -65,9 +74,9 @@ class VimCityGame
       elsif input == 'l'
         update_cursor(1,0)
 
+      # insert mode - place buildings
       elsif input == 'i'
         building_menu
-
 
       elsif input == ' '
         if @insert_mode
@@ -79,21 +88,24 @@ class VimCityGame
       elsif input == 'p'
         add_building
 
+      # destroy buildings
       elsif input == 'x'
         destroy_building
       end
 
       update_status_bar
-      @city.update()
+      @city.update
       wait 80
     end
   end
 
   def display_splash
+
     @main_buffer[1] = " "*(VIM::Window.current.width-1)
     (1...VIM::Window.current.height).each do |i|
       @main_buffer.append(i, " "*(VIM::Window.current.width-1))
     end
+
     ss = File.open("#{Dir.pwd}/lib/menu.txt")
     ss_chars = []
     ss.each_line{|line| ss_chars << line}
@@ -103,6 +115,7 @@ class VimCityGame
                          ss_chars)
 
     input = wait_for_input(["any"])
+
     if input == 'q'
       quit
     else
@@ -110,14 +123,28 @@ class VimCityGame
     end
   end
 
+  def wait_for_input(valid_input)
+    return if Array.new(valid_input).empty?
 
-  private
+    if valid_input.include?("any")
+      char = VIM::evaluate("getchar()")
+    else
+      while true
+        char = VIM::evaluate("getchar()")
+        break if valid_input.include?(char.chr)
+      end
+    end
+
+    return char.chr
+  end
 
   ##
-  # :section: init
+  # :section: initialization
 
+  ##
+  # Create a starting city with the basics
   def init_city
-    #load city stuff here when we get to it
+
     @city = City.new(5900, 70)
 
     house = Seitch.new()
@@ -129,15 +156,18 @@ class VimCityGame
     init_building(house,35,37)
     init_building(house,36,37)
     init_building(house,37,34)
+
     starport = Starport.new()
     init_building(starport ,30,30)
+
     farm = FarmA.new()
     init_building(farm ,37,24)
+
     atmo = AtmoGen.new()
     init_building(atmo ,34,30)
   end
 
-  def init_building (building, y, x)
+  def init_building(building, y, x)
     building.add_to_city(@city)
     @map.add_building(building, y, x)
     print_area_to_buffer(@main_buffer, y, x, building.symbol)
@@ -158,6 +188,11 @@ class VimCityGame
     VIM::evaluate("genutils#MoveCursorToWindow(2)")
   end
 
+  ##
+  # :section: event updates 
+
+  ##
+  # updates the top status bar with current city stats and/or warning messages
   def update_status_bar
     VIM::evaluate("genutils#MoveCursorToWindow(1)")
     @status_buffer[1] = " "*@width
@@ -169,6 +204,10 @@ class VimCityGame
     VIM::evaluate("genutils#MoveCursorToWindow(2)")
   end
 
+  ##
+  # copies to contents of @last_chars to the screen where the cursor is
+  # and copies the contents of the map where the cursor is moving to
+  # @last_chars, this supports variable-sized cursors
   def update_cursor(x,y)
     c = get_cursor_pos
 
@@ -177,22 +216,27 @@ class VimCityGame
 
     print_area_to_buffer(@main_buffer, c[0], c[1], @last_chars)
 
+    # we don't want the cursor going off the buffer, so we need to adjust
+    # for offset
     c[0] += y
     c[0] = 1 if c[0] < 1
-    c[0] = @map.height+2-cursor_height if c[0]+cursor_height >= @map.height+2
+    c[0] = (@map.height + 2 - cursor_height) if c[0]+cursor_height >= (@map.height + 2)
 
     c[1] += x
     c[1] = @map.offset if c[1] < @map.offset
-    c[1] = @map.width-(@map.offset)-cursor_width+2 if c[1]+cursor_width >= (@map.width+@map.offset+1)
+    c[1] = (@map.width + 2 - (@map.offset) - cursor_width) if c[1]+cursor_width >= (@map.width + @map.offset + 1)
 
     set_cursor_pos(c[0], c[1])
 
     @last_chars = cache_area(@main_buffer,
                              c[0], cursor_height,
                              c[1], cursor_width)
+
     print_area_to_buffer(@main_buffer, c[0], c[1], @cursor)
   end
 
+  ##
+  # return the cursor to the base character
   def reset_cursor
     c = get_cursor_pos
     print_area_to_buffer(@main_buffer, c[0], c[1], @last_chars)
@@ -205,21 +249,64 @@ class VimCityGame
     return
   end
 
-  def wait_for_input(valid_input)
-    return if Array.new(valid_input).empty?
+  def add_building
+    return unless @insert_mode && @current_building
 
-    if valid_input.include?("any")
-      char = VIM::evaluate("getchar()")
-    else
-      while true
-        char = VIM::evaluate("getchar()")
-        break if valid_input.include?(char.chr)
-      end
+    failure = false
+    @last_chars.each do |row|
+      failure = true if row != "."*@current_building.width
     end
 
-    return char.chr
+    # warn and return if failure
+    if failure
+      print_to_status_buffer(@status_buffer, 3, 0,
+                             "You cannot place that building there!")
+      return
+    end
+
+    # warn and return if not enough coins
+    if @city.coins < @current_building.cost
+      print_to_status_buffer(@status_buffer, 3, 0,
+                             "You require more coins to construct that building.")
+      return
+    end
+
+    # warn and return if not enough free workers
+    if @city.free_workers - @current_building.workers_required < 0
+      print_to_status_buffer(@status_buffer, 3, 0,
+                             "You do not have the citizens to optimally operate that facility!")
+      return
+    end
+
+    @current_building.add_to_city(@city)
+    c = get_cursor_pos
+    @map.add_building(@current_building, c[0], c[1])
+    @last_chars = @current_building.symbol
+  end
+    
+  def destroy_building
+    c = get_cursor_pos
+    building, building_coords = @map.destroy_building(c[0], c[1])
+    print "#{building}"
+    return if building.nil?
+
+    blank_building = Array.new(building.height) { "."*building.width }
+    print_area_to_buffer(@main_buffer,
+                         building_coords[0],
+                         building_coords[1],
+                         blank_building)
+    @last_chars = cache_area(@main_buffer,
+                             c[0], building.height,
+                             c[1], building.width)
+    building.remove_from_city(@city)
   end
 
+
+  ##
+  # :section: menus
+
+  ##
+  # this menu shows a preview and description of the available buildings
   def building_menu
     
     buffer = popup_buffer('new_building', 44)
@@ -284,58 +371,6 @@ class VimCityGame
     end
 
     quit
-  end
-
-  def add_building
-    return unless @insert_mode && @current_building
-
-    failure = false
-    @last_chars.each do |row|
-      failure = true if row != "."*@current_building.width
-    end
-
-    # warn and return if failure
-    if failure
-      print_to_status_buffer(@status_buffer, 3, 0,
-                             "You cannot place that building there!")
-      return
-    end
-
-    # warn and return if not enough coins
-    if @city.coins < @current_building.cost
-      print_to_status_buffer(@status_buffer, 3, 0,
-                             "You require more coins to construct that building.")
-      return
-    end
-
-    # warn and return if not enough free workers
-    if @city.free_workers - @current_building.workers_required < 0
-      print_to_status_buffer(@status_buffer, 3, 0,
-                             "You do not have the citizens to optimally operate that facility!")
-      return
-    end
-
-    @current_building.add_to_city(@city)
-    c = get_cursor_pos
-    @map.add_building(@current_building, c[0], c[1])
-    @last_chars = @current_building.symbol
-  end
-    
-  def destroy_building
-    c = get_cursor_pos
-    building, building_coords = @map.destroy_building(c[0], c[1])
-    print "#{building}"
-    return if building.nil?
-
-    blank_building = Array.new(building.height) { "."*building.width }
-    print_area_to_buffer(@main_buffer,
-                         building_coords[0],
-                         building_coords[1],
-                         blank_building)
-    @last_chars = cache_area(@main_buffer,
-                             c[0], building.height,
-                             c[1], building.width)
-    building.remove_from_city(@city)
   end
 end
 
