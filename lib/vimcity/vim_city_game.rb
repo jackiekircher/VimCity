@@ -178,7 +178,7 @@ class VimCityGame
   end
 
   def init_cursor
-    @cursor = [" "] #use an array for area cursors
+    @cursor = ["\u2588"] #use an array for area cursors
     c = get_cursor_pos
     @last_chars = cache_area(@main_buffer, c[0], 1, c[1], 1)
     print_area_to_buffer(@main_buffer, c[0], c[1], @cursor)
@@ -247,7 +247,7 @@ class VimCityGame
     @last_chars = cache_area(@main_buffer,
                              c[0], 1,
                              c[1], 1)
-    @cursor = [" "]
+    @cursor = ["\u2588"]
     print_area_to_buffer(@main_buffer, c[0], c[1], @cursor)
 
     return
@@ -289,6 +289,7 @@ class VimCityGame
   end
     
   def destroy_building
+    # \u2620
     c = get_cursor_pos
     building, building_coords = @map.destroy_building(c[0], c[1])
     print "#{building}"
