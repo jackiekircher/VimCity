@@ -41,6 +41,14 @@ module VimWrapper
     VIM::command("setlocal noswapfile")
     VIM::command("setlocal buftype=nofile")
 
-    return VIM::Buffer.current
+    ##
+    # fill up the new buffer so it can be drawn on
+    buffer = VIM::Buffer.current
+    window = VIM::Window.current
+    (1...window.height).each do |line|
+      buffer.append(line, " "*window.width)
+    end
+
+    return buffer, window
   end
 end

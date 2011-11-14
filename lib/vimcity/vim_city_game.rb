@@ -64,6 +64,10 @@ class VimCityGame
           return
         end
 
+      # help menu
+      elsif input == "?"
+        help_menu
+
       # cursor movement
       elsif input == 'h'
         update_cursor(-1,0)
@@ -200,7 +204,7 @@ class VimCityGame
     print_to_buffer(@status_buffer, 1, 18, "Population: #{@city.population.round} / #{@city.population_cap}")
     print_to_buffer(@status_buffer, 1, 40, "Free people: #{@city.free_workers.round}")
     print_to_buffer(@status_buffer, 1, 60, "Oxygen: #{@city.oxygen.round}")
-    print_to_buffer(@status_buffer, 2, 90, "- Press 'i' to make buildings - and 'x' to destroy them! -")
+    print_to_buffer(@status_buffer, 2, 90, "- Press '?' for commands -")
     VIM::evaluate("genutils#MoveCursorToWindow(2)")
   end
 
@@ -309,51 +313,47 @@ class VimCityGame
   # this menu shows a preview and description of the available buildings
   def building_menu
     
-    buffer = popup_buffer('new_building', 44)
+    buffer, window = popup_buffer('new_building', 44)
 
-    w = VIM::Window.current
-    (1...w.height).each do |line|
-      buffer.append(line, " "*w.width)
-    end
-    buffer[1]  = "--------------------------------------------"
-    buffer[2]  = "--- press tab to view all building types ---"
-    buffer[3]  = "--------------------------------------------"
-    buffer[4]  = "---        press space to cancel         ---"
-    buffer[5]  = "--------------------------------------------"
-
+    buffer[1] = "--------------------------------------------"
+    buffer[2] = "--- press tab to view all building types ---"
+    buffer[3] = "--------------------------------------------"
+    buffer[4] = "---        press space to cancel         ---"
+    buffer[5] = "--------------------------------------------"
 
     buildings = Building::BUILDING_TYPES
     select = 0
 
     while true
-      #building preview
       building = Kernel.const_get(buildings[select]).new
-      buffer[w.height] = "--------------------------------------------"
-      buffer[w.height-2] = "  Bonuses: #{building.bonuses}"
-      buffer[w.height-3] = "  Workers Required: #{building.workers_required}"
-      buffer[w.height-4] = "  Capacity: #{building.capacity}"
-      buffer[w.height-5] = "  Cost: #{building.cost}"
-      buffer[w.height-8] = "  #{building.description}"
+      buffer[window.height] = "--------------------------------------------"
+      buffer[window.height-2] = "  Bonuses: #{building.bonuses}"
+      buffer[window.height-3] = "  Workers Required: #{building.workers_required}"
+      buffer[window.height-4] = "  Capacity: #{building.capacity}"
+      buffer[window.height-5] = "  Cost: #{building.cost}"
+      buffer[window.height-8] = "  #{building.description}"
 
       print_area_to_buffer(buffer,
-                           (w.height/2)-(2+building.height/2),
-                           (w.width/2)-(building.width/2),
+                           (window.height/2) - (2 + building.height/2),
+                           (window.width/2) - (building.width/2),
                            building.symbol)
       redraw
 
+      # use our own mini event loop while menu is open
       input = wait_for_input(["\t","\r"," ","q"])
       if input == "\t"
         # cycle through buildings
         select += 1
         select  = 0 if select > (buildings.size - 1)
-        (6...(w.height-1)).each do |row|
-          buffer[row] = " "*w.width
+        (6...(window.height - 1)).each do |row|
+          buffer[row] = " "*window.width
         end
+
       elsif input == "\r"
         # select building
         quit
 
-        #c = VIM::Window.current.cursor
+        # set cursor to selected building
         c = get_cursor_pos
         print_area_to_buffer(@main_buffer, c[0], c[1], @last_chars)
         @last_chars = cache_area(@main_buffer,
@@ -370,6 +370,37 @@ class VimCityGame
       end
     end
 
+    quit
+  end
+
+  ##
+  # this menu lists the available game commands
+  def help_menu
+
+    buffer, window = popup_buffer('help', 44)
+
+    buffer[1]  = "--------------------------------------------"
+    buffer[2]  = "---             VimCity Help             ---"
+    buffer[3]  = "--------------------------------------------"
+
+    buffer[6]  = " -- while in command mode (default) --      "
+    buffer[7]  = "   ? : bring up help menu                   "
+    buffer[8]  = "   h,j,k,l : move cursor                    "
+    buffer[9]  = "   i : place building (enter insert mode)   "
+    buffer[10] = "   x : destroy building underneath          "
+    buffer[11] = "       cursor                               "
+    buffer[12] = "   q : quit game                            "
+
+    buffer[14] = " -- while in insert mode --                 "
+    buffer[15] = "   p : place building                       "
+    buffer[16] = "   space : return to command mode           "
+
+    buffer[window.height-2] = "--------------------------------------------"
+    buffer[window.height-1] = "---       press any key to return        ---"
+    buffer[window.height]   = "--------------------------------------------"
+
+    redraw
+    wait_for_input(["any"])
     quit
   end
 end
