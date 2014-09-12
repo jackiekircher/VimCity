@@ -40,6 +40,7 @@ module VimWrapper
     VIM::command("setlocal nonumber")
     VIM::command("setlocal noswapfile")
     VIM::command("setlocal buftype=nofile")
+    VIM::command("setlocal nolist")
 
     ##
     # fill up the new buffer so it can be drawn on

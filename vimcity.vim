@@ -61,6 +61,7 @@ function! s:play()
   setlocal buftype=nofile
   setlocal nowrap
   setlocal so=999
+  setlocal nolist
   
   exec "sp Welcome_to_VimCity"
   exec "resize 3"
@@ -69,6 +70,7 @@ function! s:play()
   setlocal noswapfile
   setlocal buftype=nofile
   setlocal nowrap
+  setlocal nolist
 
   " load the game!
   ruby load "lib/vimcity.rb"
