@@ -1,4 +1,4 @@
-require_relative 'printer'
+require 'lib/vimcity/printer'
 
 class VimCityGame
   include Printer

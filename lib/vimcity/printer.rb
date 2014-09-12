@@ -1,4 +1,4 @@
-require_relative 'vim_wrapper'
+require 'lib/vimcity/vim_wrapper'
 
 module Printer
   include VimWrapper
